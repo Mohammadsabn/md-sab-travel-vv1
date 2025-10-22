@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bus Booking - TravelEase</title>
+    <title>Train Booking - TravelEase</title>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Define Custom Colors for Tailwind (Primary: Emerald/Green) -->
+    <!-- Define Custom Colors for Tailwind (Primary: Indigo) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        // Custom primary color (matching emerald-600)
-                        'primary': '#059669', 
-                        'primary-hover': '#047857',
+                        // Custom primary color (matching indigo-600)
+                        'primary': '#4f46e5', 
+                        'primary-hover': '#4338ca',
                     },
                 }
             }
         }
     </script>
 
-    <!-- Load Font Awesome Icons -->
+    <!-- Load Font Awesome Icons (Ensuring the correct CDN link is used) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ87od/hH2uoFrJdK/W4pE5yJ8T4nK/W4yT/h6/H/9/Q8C0S6P+I/J+I/K+S+A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
@@ -61,58 +61,6 @@
             transform: translateY(-2px);
             transition: transform 0.2s ease-in-out;
         }
-
-        /* Custom Seat Styles */
-        .seat {
-            width: 40px;
-            height: 40px;
-            margin: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px 8px 3px 3px; /* Slightly rounded top, flat bottom */
-            font-size: 10px;
-            cursor: pointer;
-            user-select: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.15s ease;
-            font-weight: 600;
-        }
-
-        .seat.available {
-            background-color: #ecfdf5; /* Emerald 50 */
-            color: #065f46; /* Emerald 800 */
-            border: 1px solid #34d399; /* Emerald 400 */
-        }
-        .seat.available:hover {
-            transform: scale(1.05);
-            background-color: #a7f3d0; /* Emerald 200 */
-        }
-
-        .seat.booked {
-            background-color: #fca5a5; /* Red 300 */
-            color: #7f1d1d; /* Red 900 */
-            cursor: not-allowed;
-            opacity: 0.7;
-            box-shadow: none;
-        }
-
-        .seat.selected {
-            background-color: #059669; /* Primary */
-            color: white;
-            border: 1px solid #047857; /* Primary Dark */
-            transform: scale(1.08);
-            box-shadow: 0 3px 6px rgba(5, 150, 105, 0.4);
-        }
-
-        .seat-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .seat-map-aisle {
-            width: 30px; /* Space for the aisle */
-        }
     </style>
 </head>
 <body>
@@ -121,21 +69,19 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
-                    <i class="fas fa-bus-alt text-primary text-3xl"></i>
+                    <i class="fas fa-train text-primary text-3xl"></i>
                     <h1 class="text-3xl font-extrabold text-gray-800">Journey<span class="text-primary">Ease</span></h1>
                 </div>
                 <nav class="hidden md:flex space-x-6 items-end">
-                    <!-- Flights Tab -->
-                    <a href="index.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-plane mr-2"></i>Flights</a>
-                    <!-- Trains Tab -->
-                    <a href="train.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-train mr-2"></i>Trains</a>
-                    
+                    <!-- Linking back to index.html to simulate multi-page navigation -->
+                    <a href="../index.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-plane mr-2"></i>Flights</a>
                     <!-- Active Tab -->
-                    <a href="bus.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150"><i class="fas fa-bus-alt mr-2"></i>Buses</a>
+                    <a href="/pages/train.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150"><i class="fas fa-train mr-2"></i>Trains</a>
                     
                     <!-- Other Tabs -->
-                    <a href="hotel.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
-                    <a href="cabs.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-taxi mr-2"></i>Cabs</a>
+                    <a href="/pages/bus.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-bus-alt mr-2"></i>Buses</a>
+                    <a href="/pages/hotel.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
+                    <a href="/pages/cabs.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-taxi mr-2"></i>Cabs</a>
                 </nav>
             </div>
         </div>
@@ -148,27 +94,27 @@
         <!-- 1. SEARCH VIEW (Initial Screen) -->
         <!-- ==================================================================== -->
         <div id="search-view" class="view active">
-            <div class="bg-white p-6 md:p-8 rounded-xl search-card shadow-2xl shadow-emerald-100/50 relative z-0">
-                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6">Search for Buses</h2>
+            <div class="bg-white p-6 md:p-8 rounded-xl search-card shadow-2xl shadow-indigo-100/50 relative z-0">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6">Search for Trains</h2>
                 
-                <form id="bus-search-form" onsubmit="handleBusSearch(event)" class="space-y-6">
+                <form id="train-search-form" onsubmit="handleTrainSearch(event)" class="space-y-6">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         
                         <!-- From -->
                         <div>
                             <label for="from" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i> From</label>
-                            <input type="text" id="from" name="from" value="Bengaluru" placeholder="Origin City" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
+                            <input type="text" id="from" name="from" value="New Delhi" placeholder="Origin Station" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
                         </div>
 
                         <!-- To -->
                         <div>
                             <label for="to" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-map-marker-alt text-green-500 mr-1"></i> To</label>
-                            <input type="text" id="to" name="to" value="Chennai" placeholder="Destination City" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
+                            <input type="text" id="to" name="to" value="Mumbai" placeholder="Destination Station" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
                         </div>
 
                         <!-- Departure Date -->
                         <div>
-                            <label for="departure_date" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-calendar-alt text-primary mr-1"></i> Departure</label>
+                            <label for="departure_date" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-calendar-alt text-indigo-500 mr-1"></i> Departure</label>
                             <input type="date" id="departure_date" name="departure_date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
                         </div>
 
@@ -178,6 +124,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="passengers" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-users text-teal-500 mr-1"></i> Passengers</label>
+                            <!-- NOTE: Changed default value to 2 to better showcase dynamic forms -->
                             <select id="passengers" name="passengers" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white">
                                 <option value="1">1 Adult</option>
                                 <option value="2" selected>2 Adults</option> 
@@ -189,8 +136,8 @@
 
                     <!-- Search Button -->
                     <div class="text-center pt-4">
-                        <button type="submit" class="w-full sm:w-1/2 lg:w-1/3 py-4 px-6 bg-primary text-white font-bold text-lg rounded-full hover:bg-primary-hover transition duration-300 shadow-xl shadow-emerald-400/50 flex items-center justify-center mx-auto transform hover:scale-[1.01]">
-                            <i class="fas fa-search mr-2"></i> Search Buses
+                        <button type="submit" class="w-full sm:w-1/2 lg:w-1/3 py-4 px-6 bg-primary text-white font-bold text-lg rounded-full hover:bg-primary-hover transition duration-300 shadow-xl shadow-indigo-400/50 flex items-center justify-center mx-auto transform hover:scale-[1.01]">
+                            <i class="fas fa-search mr-2"></i> Search Trains
                         </button>
                     </div>
                 </form>
@@ -198,100 +145,60 @@
         </div>
 
         <!-- ==================================================================== -->
-        <!-- 2. RESULTS VIEW (Select Bus) -->
+        <!-- 2. RESULTS VIEW (Select Train) -->
         <!-- ==================================================================== -->
         <div id="results-view" class="view">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Available Buses <span id="route-display" class="text-primary text-xl font-semibold ml-2"></span></h2>
-            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-emerald-100/50 space-y-4">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Available Trains <span id="route-display" class="text-primary text-xl font-semibold ml-2"></span></h2>
+            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-indigo-100/50 space-y-4">
                 
                 <!-- Back Button -->
                 <button onclick="switchView('search-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition mb-4 flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Search
                 </button>
 
-                <!-- Sample Bus Result 1 -->
+                <!-- Sample Train Result 1 -->
                 <div class="border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-lg transition duration-200">
                     <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">Red Line Volvo (AC Sleeper)</p>
-                        <p class="text-sm text-gray-500">Departure: 21:00 | Arrival: 06:30 (+1 day) | Duration: 9h 30m</p>
-                        <p class="text-lg font-semibold text-teal-600 mt-1">Price per person: <span class="text-gray-800 font-bold">₹ 1,850</span> | Seats Available: 8</p>
+                        <p class="text-xl font-bold text-gray-800">Duronto Express (12222)</p>
+                        <p class="text-sm text-gray-500">Departure: 14:30 | Arrival: 06:15 (+1 day)</p>
+                        <p class="text-lg font-semibold text-teal-600 mt-1">Price per person: <span class="text-gray-800 font-bold">₹ 4,500</span> | Available: AC-First Class, Sleeper</p>
                     </div>
                     <div class="text-right mt-3 md:mt-0">
-                        <button onclick="handleSelectBus('Red Line Volvo', '1850')" class="mt-2 py-2 px-6 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition duration-200 shadow-md flex items-center justify-center">
-                            <i class="fas fa-check-circle mr-2"></i> Select Seats
+                        <button onclick="handleSelectTrain('Duronto Express', '4500')" class="mt-2 py-2 px-6 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition duration-200 shadow-md flex items-center justify-center">
+                            <i class="fas fa-plus mr-2"></i> Book & Add Passengers
                         </button>
                     </div>
                 </div>
 
-                <!-- Sample Bus Result 2 -->
+                <!-- Sample Train Result 2 -->
                 <div class="border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-lg transition duration-200">
                     <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">KSRTC Executive (Non-AC Seater)</p>
-                        <p class="text-sm text-gray-500">Departure: 13:00 | Arrival: 23:59 | Duration: 10h 59m</p>
-                        <p class="text-lg font-semibold text-teal-600 mt-1">Price per person: <span class="text-gray-800 font-bold">₹ 980</span> | Seats Available: 22</p>
+                        <p class="text-xl font-bold text-gray-800">Rajdhani Superfast (12952)</p>
+                        <p class="text-sm text-gray-500">Departure: 17:00 | Arrival: 10:45 (+1 day)</p>
+                        <p class="text-lg font-semibold text-teal-600 mt-1">Price per person: <span class="text-gray-800 font-bold">₹ 3,200</span> | Available: AC-3 Tier, Sleeper</p>
                     </div>
                     <div class="text-right mt-3 md:mt-0">
-                        <button onclick="handleSelectBus('KSRTC Executive', '980')" class="mt-2 py-2 px-6 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition duration-200 shadow-md flex items-center justify-center">
-                             <i class="fas fa-check-circle mr-2"></i> Select Seats
+                        <button onclick="handleSelectTrain('Rajdhani Superfast', '3200')" class="mt-2 py-2 px-6 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition duration-200 shadow-md flex items-center justify-center">
+                             <i class="fas fa-plus mr-2"></i> Book & Add Passengers
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================================================================== -->
-        <!-- 2.5. SEAT VIEW (Select Seats) -->
-        <!-- ==================================================================== -->
-        <div id="seat-view" class="view">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Select Your Seats</h2>
-            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-emerald-100/50">
-                <button onclick="switchView('results-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition mb-4 flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Change Bus
-                </button>
-
-                <div class="flex justify-center p-4 rounded-lg flex-wrap gap-4">
-                    <!-- Legend -->
-                    <div class="flex items-center space-x-2 text-sm text-gray-500">
-                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div><span>Available</span>
-                    </div>
-                    <div class="flex items-center space-x-2 text-sm text-gray-500">
-                        <div class="w-3 h-3 rounded-full bg-red-400"></div><span>Booked</span>
-                    </div>
-                    <div class="flex items-center space-x-2 text-sm text-gray-500">
-                        <div class="w-3 h-3 rounded-full bg-primary"></div><span>Selected</span>
-                    </div>
-                </div>
-                
-                <div id="seat-map-container" class="flex justify-center p-4 bg-gray-50 rounded-lg shadow-inner">
-                    <!-- Seat Map will be generated here by JavaScript -->
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-gray-200">
-                    <div id="seat-info-summary" class="text-center text-lg font-semibold mb-4 text-gray-700">
-                        <!-- Summary info here -->
-                    </div>
-                    <div class="text-center">
-                        <button onclick="handleProceedToPassengers()" id="proceed-to-passenger-btn" disabled class="w-full md:w-1/3 py-3 px-6 bg-gray-400 text-white font-bold text-lg rounded-full transition duration-300 shadow-xl disabled:opacity-50">
-                            Select Remaining Seats
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- ==================================================================== -->
         <!-- 3. PASSENGER VIEW (Enter Passenger Details) -->
         <!-- ==================================================================== -->
         <div id="passenger-view" class="view">
             <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Passenger Details</h2>
             <p class="text-lg text-gray-600 mb-6">
-                Booking: <span id="bus-name-display" class="font-bold text-primary"></span> 
-                (<span class="font-bold text-primary">₹ <span id="bus-price-per-person"></span> per person</span>)
+                Booking: <span id="train-name-display" class="font-bold text-primary"></span> 
+                (<span class="font-bold text-primary">₹ <span id="train-price-per-person"></span> per person</span>)
             </p>
 
-            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-emerald-100/50">
-                <button onclick="switchView('seat-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition mb-4 flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Change Seats
+            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-indigo-100/50">
+                <button onclick="switchView('results-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition mb-4 flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Change Train
                 </button>
                 
                 <form id="passenger-form" onsubmit="handlePassengerForm(event)" class="space-y-6">
@@ -310,7 +217,7 @@
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="tel" id="phone" value="+919876543210" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
+                            <input type="tel" id="phone" value="+1234567890" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
                         </div>
                     </div>
 
@@ -330,7 +237,7 @@
         <div id="payment-view" class="view">
             <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Complete Payment</h2>
             
-            <div class="bg-white p-6 md:p-10 rounded-xl shadow-2xl shadow-emerald-100/50 max-w-lg mx-auto">
+            <div class="bg-white p-6 md:p-10 rounded-xl shadow-2xl shadow-indigo-100/50 max-w-lg mx-auto">
                 <p class="text-2xl font-bold text-red-600 mb-4">Total Amount: <span id="final-price-display" class="text-3xl"></span></p>
                 <p class="text-sm text-gray-600 mb-6">Includes base fare, taxes, and service fees for <span id="num-passengers-display" class="font-semibold text-primary"></span> travelers.</p>
                 
@@ -343,16 +250,16 @@
                     <!-- Placeholder Card Details -->
                     <div>
                         <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                        <input type="text" id="card-number" value="4111 2222 3333 4444" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                        <input type="text" id="card-number" value="1234 5678 9012 3456" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                     </div>
                     <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label for="expiry" class="block text-sm font-medium text-gray-700 mb-1">Expiry</label>
-                            <input type="text" id="expiry" value="09/27" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <input type="text" id="expiry" value="12/26" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                         </div>
                         <div class="col-span-2">
                             <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                            <input type="text" id="cvv" value="456" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <input type="text" id="cvv" value="123" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                         </div>
                     </div>
                 </div>
@@ -372,14 +279,13 @@
         <div id="confirmation-view" class="view">
             <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl shadow-green-200/50 text-center max-w-xl mx-auto">
                 <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
-                <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Bus Ticket Confirmed!</h2>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Booking Confirmed!</h2>
                 <p class="text-xl text-gray-600 mb-6">Your e-ticket has been successfully processed.</p>
                 
                 <div class="bg-green-50 p-4 rounded-lg border border-green-200 mb-8 text-left">
-                    <p class="text-md text-green-800 font-semibold mb-1">Booking ID: <span class="font-bold">BUS-951048</span></p>
-                    <p class="text-sm text-green-700">Bus Operator: <span id="final-bus-name" class="font-medium"></span></p>
+                    <p class="text-md text-green-800 font-semibold mb-1">Booking ID: <span class="font-bold">TRN-4720912</span></p>
+                    <p class="text-sm text-green-700">Train: <span id="final-train-name" class="font-medium"></span></p>
                     <p class="text-sm text-green-700">Route: <span id="final-route-display" class="font-medium"></span></p>
-                    <p class="text-sm text-green-700">Selected Seats: <span id="final-seats-display" class="font-bold"></span></p>
                     <p class="text-lg text-green-800 font-bold mt-2 border-t pt-2">Total Paid: <span id="final-price-confirmation"></span></p>
                 </div>
 
@@ -419,28 +325,11 @@
             to: '',
             date: '',
             passengers: 0,
-            busName: '',
+            trainName: '',
             price: 0, // Price per person
             totalPrice: 0,
-            selectedSeats: [], // Array to store selected seat IDs (e.g., ['A1', 'B2'])
             passengersData: []
         };
-
-        // Simulated Seat Data (2x2 layout for a 40-seater bus - 10 rows, 4 seats each)
-        // A & B are left side, C & D are right side, with an aisle between B and C
-        const SEAT_MAP_DATA = [
-            { id: 'A1', status: 'booked' }, { id: 'B1', status: 'available' }, { id: 'C1', status: 'available' }, { id: 'D1', status: 'available' },
-            { id: 'A2', status: 'available' }, { id: 'B2', status: 'available' }, { id: 'C2', status: 'available' }, { id: 'D2', status: 'booked' },
-            { id: 'A3', status: 'booked' }, { id: 'B3', status: 'available' }, { id: 'C3', status: 'available' }, { id: 'D3', status: 'available' },
-            { id: 'A4', status: 'available' }, { id: 'B4', status: 'booked' }, { id: 'C4', status: 'available' }, { id: 'D4', status: 'available' },
-            { id: 'A5', status: 'available' }, { id: 'B5', status: 'available' }, { id: 'C5', status: 'booked' }, { id: 'D5', status: 'available' },
-            { id: 'A6', status: 'available' }, { id: 'B6', status: 'available' }, { id: 'C6', status: 'available' }, { id: 'D6', status: 'available' },
-            { id: 'A7', status: 'booked' }, { id: 'B7', status: 'available' }, { id: 'C7', status: 'available' }, { id: 'D7', status: 'available' },
-            { id: 'A8', status: 'available' }, { id: 'B8', status: 'booked' }, { id: 'C8', status: 'available' }, { id: 'D8', status: 'booked' },
-            { id: 'A9', status: 'available' }, { id: 'B9', status: 'available' }, { id: 'C9', status: 'available' }, { id: 'D9', status: 'available' },
-            { id: 'A10', status: 'available' }, { id: 'B10', status: 'available' }, { id: 'C10', status: 'available' }, { id: 'D10', status: 'available' },
-        ];
-
 
         // Initialize the year in the footer
         document.getElementById('current-year-footer').textContent = new Date().getFullYear();
@@ -464,7 +353,7 @@
         }
 
         // --- STEP 1: SEARCH VIEW HANDLER ---
-        function handleBusSearch(event) {
+        function handleTrainSearch(event) {
             event.preventDefault(); 
             
             const from = document.getElementById('from').value;
@@ -492,180 +381,37 @@
             setTimeout(() => switchView('results-view'), 100); // Small delay to ensure smooth transition
         }
 
-        // --- STEP 2: RESULTS VIEW HANDLER (Select Bus) ---
-        function handleSelectBus(busName, price) {
-            // Store selected bus details globally
-            bookingDetails.busName = busName;
+        // --- STEP 2: RESULTS VIEW HANDLER (Select Train) ---
+        function handleSelectTrain(trainName, price) {
+            // Store selected train details globally
+            bookingDetails.trainName = trainName;
             bookingDetails.price = parseFloat(price); // Price per person
-            bookingDetails.selectedSeats = []; // Reset seats for new bus
 
-            // Update details on the seat selection page (uses elements defined in passenger view, but shared for display)
-            document.getElementById('bus-name-display').textContent = busName;
-            document.getElementById('bus-price-per-person').textContent = price;
+            // Update details on the passenger form page
+            document.getElementById('train-name-display').textContent = trainName;
+            document.getElementById('train-price-per-person').textContent = price;
 
-            // Render the seat map for the selected bus
-            renderSeatMap();
-            
-            // Go to Step 2.5: Seat View
-            switchView('seat-view');
-        }
-
-        // --- STEP 2.5: SEAT SELECTION LOGIC ---
-
-        function updateSeatSummary() {
-            const summaryEl = document.getElementById('seat-info-summary');
-            const required = bookingDetails.passengers;
-            const selected = bookingDetails.selectedSeats.length;
-            const proceedBtn = document.getElementById('proceed-to-passenger-btn');
-            
-            summaryEl.innerHTML = `
-                You need to select <span class="text-primary font-extrabold">${required}</span> seat${required > 1 ? 's' : ''}.
-                Currently selected: <span class="font-extrabold ${selected === required ? 'text-green-600' : 'text-orange-500'}">${selected}</span>.
-                ${selected > 0 ? `<br>Selected Seats: <span class="text-gray-900 font-normal text-sm">${bookingDetails.selectedSeats.join(', ')}</span>` : ''}
-            `;
-
-            if (selected === required) {
-                proceedBtn.classList.remove('bg-gray-400');
-                proceedBtn.classList.add('bg-primary', 'hover:bg-primary-hover');
-                proceedBtn.removeAttribute('disabled');
-                proceedBtn.textContent = `Proceed with ${selected} Seat${selected > 1 ? 's' : ''}`;
-            } else {
-                proceedBtn.classList.add('bg-gray-400');
-                proceedBtn.classList.remove('bg-primary', 'hover:bg-primary-hover');
-                proceedBtn.setAttribute('disabled', 'true');
-                proceedBtn.textContent = 'Select Remaining Seats';
-            }
-        }
-
-        function handleSeatSelection(seatId, seatStatus, element) {
-            if (seatStatus === 'booked') {
-                showMessageBox(`Seat ${seatId} is already booked.`);
-                return;
-            }
-
-            const index = bookingDetails.selectedSeats.indexOf(seatId);
-            const requiredSeats = bookingDetails.passengers;
-
-            if (index > -1) {
-                // Deselect seat
-                bookingDetails.selectedSeats.splice(index, 1);
-                element.classList.remove('selected');
-                element.classList.add('available');
-            } else {
-                // Select seat
-                if (bookingDetails.selectedSeats.length < requiredSeats) {
-                    bookingDetails.selectedSeats.push(seatId);
-                    element.classList.add('selected');
-                    element.classList.remove('available');
-                } else {
-                    showMessageBox(`You can only select ${requiredSeats} seat${requiredSeats > 1 ? 's' : ''}.`);
-                }
-            }
-            updateSeatSummary();
-        }
-
-        function renderSeatMap() {
-            const container = document.getElementById('seat-map-container');
-            container.innerHTML = '';
-            
-            const mapGrid = document.createElement('div');
-            mapGrid.className = 'flex flex-col border border-gray-300 p-4 rounded-xl shadow-inner bg-gray-100 max-w-fit mx-auto';
-            container.appendChild(mapGrid);
-
-            // Create a row for the driver cabin/front
-            const frontRowEl = document.createElement('div');
-            frontRowEl.className = 'seat-row justify-end mb-4';
-            frontRowEl.innerHTML = `
-                <div class="seat bg-gray-300 text-gray-700 cursor-default" style="width: 80px;">Driver</div>
-            `;
-            mapGrid.appendChild(frontRowEl);
-
-            // Group seats by row number (1-10)
-            const seatsByRow = SEAT_MAP_DATA.reduce((acc, seat) => {
-                const rowNum = parseInt(seat.id.match(/\d+/)[0]);
-                if (!acc[rowNum]) acc[rowNum] = [];
-                acc[rowNum].push(seat);
-                return acc;
-            }, {});
-
-            // Render 10 rows
-            for (let row = 1; row <= 10; row++) {
-                const rowData = seatsByRow[row] || [];
-                const rowEl = document.createElement('div');
-                rowEl.className = 'seat-row';
-
-                rowData.forEach((seat, index) => {
-                    const seatEl = document.createElement('div');
-                    
-                    // Check if seat was previously selected (important if user navigates back)
-                    const isSelected = bookingDetails.selectedSeats.includes(seat.id);
-                    const statusClass = isSelected ? 'selected' : seat.status;
-
-                    seatEl.className = `seat ${statusClass}`;
-                    seatEl.textContent = seat.id;
-                    seatEl.id = `seat-${seat.id}`;
-                    
-                    if (seat.status !== 'booked') {
-                        seatEl.onclick = () => handleSeatSelection(seat.id, seat.status, seatEl);
-                    }
-
-                    // Insert aisle space after the second seat (column 'B')
-                    rowEl.appendChild(seatEl);
-                    if (index === 1) {
-                        const aisle = document.createElement('div');
-                        aisle.className = 'seat-map-aisle';
-                        rowEl.appendChild(aisle);
-                    }
-                });
-                mapGrid.appendChild(rowEl);
-            }
-            
-            // Update the summary initially
-            updateSeatSummary();
-        }
-
-        // --- STEP 2.5: SEAT VIEW HANDLER (Proceed to Passengers) ---
-        function handleProceedToPassengers() {
-            // Check again to be safe, though button should be disabled if not ready
-            if (bookingDetails.selectedSeats.length !== bookingDetails.passengers) {
-                showMessageBox("Please select exactly the number of seats required to proceed.");
-                return;
-            }
-
-            // Sort seats for clean display (e.g., A1, B1, C2...)
-            bookingDetails.selectedSeats.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-            // Render the required number of passenger forms, now including seat numbers
+            // Render the required number of passenger forms
             renderPassengerForms();
 
             // Go to Step 3: Passenger View
             switchView('passenger-view');
         }
 
-
         // --- Dynamic Form Rendering ---
         function renderPassengerForms() {
             const container = document.getElementById('passenger-forms-container');
             container.innerHTML = ''; // Clear existing forms
             const numPassengers = bookingDetails.passengers || 1; // Default to 1 if missing
-            const seats = bookingDetails.selectedSeats; // Get selected seats
 
             for (let i = 1; i <= numPassengers; i++) {
-                // Assign seat from the sorted array
-                const assignedSeat = seats[i - 1] ? seats[i - 1] : 'N/A';
-
                 // Pre-fill primary passenger (i=1) with example data
                 const defaultName = i === 1 ? 'Jane Doe' : `Traveler ${i}`;
                 const defaultAge = i === 1 ? 30 : (25 + i);
 
                 const passengerHtml = `
-                    <div class="border p-4 rounded-xl bg-emerald-50 shadow-md">
-                        <h3 class="font-bold text-xl text-emerald-700 mb-2">
-                            Passenger ${i} ${i === 1 ? '(Primary Traveler)' : `(Adult ${i})`}
-                        </h3>
-                        <p class="text-sm text-gray-600 mb-4">
-                            Assigned Seat: <span class="font-extrabold text-primary text-lg">${assignedSeat}</span>
-                        </p>
+                    <div class="border p-4 rounded-xl bg-indigo-50 shadow-md">
+                        <h3 class="font-bold text-xl text-indigo-700 mb-4">Passenger ${i} ${i === 1 ? '(Primary Traveler)' : `(Adult ${i})`}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="p${i}-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -728,9 +474,8 @@
                 hideMessageBox();
                 
                 // Update final confirmation details
-                document.getElementById('final-bus-name').textContent = bookingDetails.busName;
+                document.getElementById('final-train-name').textContent = bookingDetails.trainName;
                 document.getElementById('final-route-display').textContent = `${bookingDetails.from} to ${bookingDetails.to}`;
-                document.getElementById('final-seats-display').textContent = bookingDetails.selectedSeats.join(', ');
                 document.getElementById('final-price-confirmation').textContent = `₹ ${bookingDetails.totalPrice.toFixed(2)}`;
 
                 // Go to Step 5: Confirmation View
@@ -743,11 +488,8 @@
             // Collect passenger data for the file content
             const passengersList = [];
             for (let i = 1; i <= bookingDetails.passengers; i++) {
-                // Collect assigned seat number
-                const assignedSeat = bookingDetails.selectedSeats[i - 1] || 'N/A';
-
                 passengersList.push(
-                    `Seat ${assignedSeat}: ${document.getElementById(`p${i}-name`).value} (Age: ${document.getElementById(`p${i}-age`).value}, Gender: ${document.getElementById(`p${i}-gender`).value})`
+                    `Passenger ${i}: ${document.getElementById(`p${i}-name`).value} (Age: ${document.getElementById(`p${i}-age`).value}, Gender: ${document.getElementById(`p${i}-gender`).value})`
                 );
             }
 
@@ -755,11 +497,10 @@
 =============================================
              E-TICKET CONFIRMATION
 =============================================
-Booking ID: BUS-951048
-Bus Operator: ${bookingDetails.busName}
+Booking ID: TRN-4720912
+Train: ${bookingDetails.trainName}
 Route: ${bookingDetails.from} to ${bookingDetails.to}
 Departure Date: ${bookingDetails.date}
-Selected Seats: ${bookingDetails.selectedSeats.join(', ')}
 Total Paid: ₹ ${bookingDetails.totalPrice.toFixed(2)}
 
 ---------------------------------------------
@@ -783,7 +524,7 @@ Thank you for booking with JourneyEase!
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Bus_Ticket_${bookingDetails.busName.replace(/\s/g, '_')}_Seats-${bookingDetails.selectedSeats.join('-')}.txt`; 
+            a.download = `Train_Ticket_${bookingDetails.trainName.replace(/\s/g, '_')}.txt`; // Use .txt since it's not a real PDF
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
