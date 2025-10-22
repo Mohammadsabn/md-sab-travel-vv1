@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Train Booking - TravelEase</title>
+    <title>Train Booking - JourneyEase</title>
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,8 +23,8 @@
         }
     </script>
 
-    <!-- Load Font Awesome Icons (Ensuring the correct CDN link is used) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ87od/hH2uoFrJdK/W4pE5yJ8T4nK/W4yT/h6/H/9/Q8C0S6P+I/J+I/K+S+A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
         body {
@@ -65,23 +65,41 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100">
+    <header class="bg-white shadow-lg sticky top-0 z-20 border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Top Row: Logo, Desktop Nav, Mobile Toggle Button -->
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-train text-primary text-3xl"></i>
                     <h1 class="text-3xl font-extrabold text-gray-800">Journey<span class="text-primary">Ease</span></h1>
                 </div>
-                <nav class="hidden md:flex space-x-6 items-end">
+
+                <!-- DESKTOP Navigation (Visible on MD and larger) -->
+                <nav id="desktop-nav" class="hidden md:flex space-x-6 items-end">
                     <!-- Linking back to index.html to simulate multi-page navigation -->
                     <a href="../index.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-plane mr-2"></i>Flights</a>
                     <!-- Active Tab -->
                     <a href="train.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150"><i class="fas fa-train mr-2"></i>Trains</a>
-                    
                     <!-- Other Tabs -->
                     <a href="bus.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-bus-alt mr-2"></i>Buses</a>
                     <a href="hotel.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
                     <a href="cabs.html" class="tab px-2 py-1 text-gray-600 hover:text-primary flex items-center transition duration-150"><i class="fas fa-taxi mr-2"></i>Cabs</a>
+                </nav>
+                
+                <!-- MOBILE Menu Toggle Button (Hidden on MD and larger) -->
+                <button id="menu-toggle" class="md:hidden p-2 text-gray-600 hover:text-primary transition" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- MOBILE Navigation Links (Toggled via JS, Hidden on MD and larger) -->
+            <div id="mobile-menu" class="hidden md:hidden pt-2 pb-4 border-t border-gray-100">
+                <nav class="flex flex-col space-y-1">
+                    <a href="../index.html" class="block py-2 px-3 text-gray-600 hover:bg-indigo-50 hover:text-primary rounded-lg transition duration-150"><i class="fas fa-plane mr-2"></i>Flights</a>
+                    <a href="train.html" class="block py-2 px-3 text-primary font-bold bg-indigo-50 border-r-4 border-primary rounded-lg transition duration-150"><i class="fas fa-train mr-2"></i>Trains</a>
+                    <a href="bus.html" class="block py-2 px-3 text-gray-600 hover:bg-indigo-50 hover:text-primary rounded-lg transition duration-150"><i class="fas fa-bus-alt mr-2"></i>Buses</a>
+                    <a href="hotel.html" class="block py-2 px-3 text-gray-600 hover:bg-indigo-50 hover:text-primary rounded-lg transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
+                    <a href="cabs.html" class="block py-2 px-3 text-gray-600 hover:bg-indigo-50 hover:text-primary rounded-lg transition duration-150"><i class="fas fa-taxi mr-2"></i>Cabs</a>
                 </nav>
             </div>
         </div>
@@ -330,6 +348,9 @@
             totalPrice: 0,
             passengersData: []
         };
+        
+        // --- NEW: Mobile Menu State ---
+        let isMobileMenuOpen = false;
 
         // Initialize the year in the footer
         document.getElementById('current-year-footer').textContent = new Date().getFullYear();
@@ -350,7 +371,35 @@
                 targetView.classList.add('active');
                 window.scrollTo(0, 0); // Scroll to top for new view
             }
+            // Close mobile menu if open when navigating to a new view
+            if (isMobileMenuOpen) {
+                toggleMobileMenu(); 
+            }
         }
+        
+        // --- NEW: Mobile Menu Toggle Function ---
+        /**
+         * Toggles the visibility and content of the mobile navigation menu.
+         */
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.querySelector('#menu-toggle i');
+
+            isMobileMenuOpen = !isMobileMenuOpen;
+
+            if (isMobileMenuOpen) {
+                mobileMenu.classList.remove('hidden');
+                // Change icon to 'X'
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+            } else {
+                mobileMenu.classList.add('hidden');
+                // Change icon back to 'Hamburger'
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+            }
+        }
+
 
         // --- STEP 1: SEARCH VIEW HANDLER ---
         function handleTrainSearch(event) {
@@ -495,7 +544,7 @@
 
             const ticketInfo = `
 =============================================
-             E-TICKET CONFIRMATION
+              E-TICKET CONFIRMATION
 =============================================
 Booking ID: TRN-4720912
 Train: ${bookingDetails.trainName}

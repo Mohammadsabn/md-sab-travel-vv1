@@ -82,58 +82,58 @@
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
       >
-        <!-- Logo - Clicking logo returns to home search form -->
-        <button
-          onclick="backToSearchForm()"
+        <!-- Logo -->
+        <a
+          id="logo-link"
+          href="#"
           class="text-2xl font-extrabold text-primary-blue flex items-center hover:opacity-80 transition duration-150"
         >
           <i class="fas fa-suitcase-rolling mr-2 text-accent-teal"></i>
           JourneyEase
-        </button>
+        </a>
 
-        <!-- Desktop Navigation Tabs -->
-       <nav
-  id="nav-tabs"
-  class="hidden md:flex space-x-1 border-b border-gray-200"
->
-  <a
-    href="index.html"
-    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
-  >
-    <i class="fas fa-plane mr-2"></i> Flights
-  </a>
+        <!-- Desktop Nav -->
+        <nav
+          id="nav-tabs"
+          class="hidden md:flex space-x-1 border-b border-gray-200"
+        >
+          <a
+            data-page="index"
+            class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+          >
+            <i class="fas fa-plane mr-2"></i> Flights
+          </a>
 
-  <a
-    href="pages/train.html"
-    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
-  >
-    <i class="fas fa-train mr-2"></i> Trains
-  </a>
+          <a
+            data-page="train"
+            class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+          >
+            <i class="fas fa-train mr-2"></i> Trains
+          </a>
 
-  <a
-    href="pages/bus.html"
-    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
-  >
-    <i class="fas fa-bus-alt mr-2"></i> Buses
-  </a>
+          <a
+            data-page="bus"
+            class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+          >
+            <i class="fas fa-bus-alt mr-2"></i> Buses
+          </a>
 
-  <a
-    href="pages/hotel.html"
-    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
-  >
-    <i class="fas fa-hotel mr-2"></i> Hotels
-  </a>
+          <a
+            data-page="hotel"
+            class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+          >
+            <i class="fas fa-hotel mr-2"></i> Hotels
+          </a>
 
-  <a
-    href="pages/cabs.html"
-    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
-  >
-    <i class="fas fa-taxi mr-2"></i> Cabs
-  </a>
-</nav>
+          <a
+            data-page="cabs"
+            class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+          >
+            <i class="fas fa-taxi mr-2"></i> Cabs
+          </a>
+        </nav>
 
-
-        <!-- User Profile/Menu Button (NEW) -->
+        <!-- User Button -->
         <button
           onclick="viewUserDashboard()"
           class="text-gray-600 hover:text-primary-blue p-2 rounded-full transition duration-150 focus:outline-none focus:ring-2 focus:ring-primary-blue"
@@ -142,47 +142,106 @@
         </button>
       </div>
 
-      <!-- Mobile Navigation Tabs (visible only on mobile) -->
+      <!-- Mobile Nav -->
       <nav
         id="nav-tabs-mobile"
         class="md:hidden flex justify-around border-t border-gray-200 bg-white p-2"
       >
-        <button
-          data-tab="flights"
+        <a
+          data-page="index"
           class="tab active flex flex-col items-center p-1 text-xs font-semibold"
         >
           <i class="fas fa-plane text-base"></i>
           <span class="mt-1">Flights</span>
-        </button>
-        <button
-          data-tab="trains"
+        </a>
+
+        <a
+          data-page="train"
           class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
         >
           <i class="fas fa-train text-base"></i>
           <span class="mt-1">Trains</span>
-        </button>
-        <button
-          data-tab="buses"
+        </a>
+
+        <a
+          data-page="bus"
           class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
         >
           <i class="fas fa-bus-alt text-base"></i>
           <span class="mt-1">Buses</span>
-        </button>
-        <button
-          data-tab="hotels"
+        </a>
+
+        <a
+          data-page="hotel"
           class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
         >
           <i class="fas fa-hotel text-base"></i>
           <span class="mt-1">Hotels</span>
-        </button>
-        <button
-          data-tab="cabs"
+        </a>
+
+        <a
+          data-page="cabs"
           class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
         >
-          <i class="fas fa-taxi text-base"></i> <span class="mt-1">Cabs</span>
-        </button>
+          <i class="fas fa-taxi text-base"></i>
+          <span class="mt-1">Cabs</span>
+        </a>
       </nav>
     </header>
+
+    <!-- Add this script at the end of the body (or right after header) -->
+    <script>
+      (function () {
+        // Determine if current page is inside /pages/ (e.g., /your-repo/pages/train.html)
+        const path = window.location.pathname; // e.g. /your-repo/pages/train.html or /your-repo/ or /your-repo/index.html
+        const inPagesFolder = path.includes("/pages/");
+
+        // Base href logic:
+        // - If we're inside /pages/, links to other page files should be relative inside the same folder (train.html)
+        // - From inside /pages/ to index, use "../index.html"
+        // - If we're at root (index.html), links to pages should be "pages/train.html"
+        const linkFor = (page) => {
+          if (page === "index") {
+            return inPagesFolder ? "../index.html" : "index.html";
+          }
+          // for other pages
+          return inPagesFolder ? `${page}.html` : `pages/${page}.html`;
+        };
+
+        // Set hrefs for desktop + mobile nav items
+        document.querySelectorAll("[data-page]").forEach((el) => {
+          const page = el.getAttribute("data-page");
+          el.setAttribute("href", linkFor(page));
+        });
+
+        // Set logo link similarly
+        const logo = document.getElementById("logo-link");
+        if (logo) logo.setAttribute("href", linkFor("index"));
+
+        // Optional: highlight current tab (adds 'text-primary-blue' class to active)
+        const current = (function getCurrentPage() {
+          if (inPagesFolder) {
+            const file = path.split("/").pop().split("?")[0].toLowerCase(); // train.html
+            return file ? file.replace(".html", "") : "train";
+          } else {
+            const file = path.split("/").pop().toLowerCase();
+            return file === "" || file === "index.html"
+              ? "index"
+              : file.replace(".html", "") || "index";
+          }
+        })();
+
+        document.querySelectorAll("[data-page]").forEach((el) => {
+          if (el.getAttribute("data-page") === current) {
+            // for example add an active class - adjust per your tailwind classes
+            el.classList.add("text-primary-blue");
+            el.classList.remove("text-gray-600");
+          } else {
+            el.classList.remove("text-primary-blue");
+          }
+        });
+      })();
+    </script>
 
     <!-- Main Content Area -->
     <main

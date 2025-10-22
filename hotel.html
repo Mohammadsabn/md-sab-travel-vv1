@@ -86,26 +86,80 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-hotel text-primary text-3xl"></i>
-                    <h1 class="text-3xl font-extrabold text-gray-800">Stay<span class="text-primary">Well</span></h1>
-                </div>
-                
-                <!-- Navigation Tabs: Flights, Trains, Bus, Cabs, Hotels (Hotels is active) -->
-                <nav class="hidden md:flex space-x-6 items-end">
-                    <a href="../index.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-plane mr-2"></i>Flights</a>
-                    <a href="train.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-train mr-2"></i>Trains</a>
-                    <a href="bus.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-bus-alt mr-2"></i>Bus</a>
-                    <a href="hotel.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
-                    <a href="cabs.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-taxi mr-2"></i>Cabs</a>
-                    <!-- Active Tab -->
-                </nav>
-            </div>
-        </div>
-    </header>
+   <header class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-4">
+      <!-- Logo -->
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-hotel text-primary text-3xl"></i>
+        <h1 class="text-3xl font-extrabold text-gray-800">
+          Stay<span class="text-primary">Well</span>
+        </h1>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex space-x-6 items-end">
+        <a href="../index.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center">
+          <i class="fas fa-plane mr-2"></i>Flights
+        </a>
+        <a href="train.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center">
+          <i class="fas fa-train mr-2"></i>Trains
+        </a>
+        <a href="bus.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center">
+          <i class="fas fa-bus-alt mr-2"></i>Bus
+        </a>
+        <a href="hotel.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150">
+          <i class="fas fa-hotel mr-2"></i>Hotels
+        </a>
+        <a href="cabs.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center">
+          <i class="fas fa-taxi mr-2"></i>Cabs
+        </a>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button id="menu-toggle" class="md:hidden text-gray-700 focus:outline-none text-2xl">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Tabs -->
+  <nav id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white py-2">
+    <div class="flex justify-around text-sm font-semibold">
+      <a href="../index.html" class="flex flex-col items-center text-gray-600 hover:text-primary">
+        <i class="fas fa-plane text-lg"></i>
+        <span>Flights</span>
+      </a>
+      <a href="train.html" class="flex flex-col items-center text-gray-600 hover:text-primary">
+        <i class="fas fa-train text-lg"></i>
+        <span>Trains</span>
+      </a>
+      <a href="bus.html" class="flex flex-col items-center text-gray-600 hover:text-primary">
+        <i class="fas fa-bus-alt text-lg"></i>
+        <span>Bus</span>
+      </a>
+      <a href="hotel.html" class="flex flex-col items-center text-primary border-b-2 border-primary">
+        <i class="fas fa-hotel text-lg"></i>
+        <span>Hotels</span>
+      </a>
+      <a href="cabs.html" class="flex flex-col items-center text-gray-600 hover:text-primary">
+        <i class="fas fa-taxi text-lg"></i>
+        <span>Cabs</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+  const menuToggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+
+  menuToggle.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
+  });
+</script>
+
 
     <!-- Main Content Wrapper: This holds all the switchable views -->
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 relative">
