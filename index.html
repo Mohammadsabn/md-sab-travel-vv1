@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JourneyEase - Travel Booking Demo</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <script>
+      // Customizing Tailwind theme with Inter font and specific colors
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            colors: {
+              "primary-blue": "#0056b3", // Deep Blue
+              "accent-teal": "#00a896", // Accent Teal
+              "background-light": "#f8f8f8",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Custom CSS for specific styling (like the active tab indicator) -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f8f8;
+      }
+
+      /* Active tab indicator style */
+      .tab.active {
+        color: #0056b3; /* Primary Blue text */
+        border-bottom: 3px solid #0056b3;
+        background-color: #e6f0ff; /* Lightest blue background */
+      }
+
+      /* Transition for smoother tab switching */
+      .tab-content {
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      .booking-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Responsive styling for the main form layout */
+      .form-grid > div {
+        flex-grow: 1; /* Ensures fields take up available space */
+        min-width: 150px; /* Minimum width before wrapping */
+      }
+
+      .payment-option:checked + label {
+        border-color: #00a896;
+        background-color: #e6fffb;
+        box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.3);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <!-- Custom Message/Toast Box (Replaces alert()) -->
+    <div
+      id="message-box"
+      class="fixed top-5 right-5 z-50 p-4 bg-red-600 text-white rounded-lg shadow-xl hidden transition-all duration-300 transform scale-95 opacity-0"
+    >
+      <p id="message-content"></p>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
+      >
+        <!-- Logo - Clicking logo returns to home search form -->
+        <button
+          onclick="backToSearchForm()"
+          class="text-2xl font-extrabold text-primary-blue flex items-center hover:opacity-80 transition duration-150"
+        >
+          <i class="fas fa-suitcase-rolling mr-2 text-accent-teal"></i>
+          JourneyEase
+        </button>
+
+        <!-- Desktop Navigation Tabs -->
+       <nav
+  id="nav-tabs"
+  class="hidden md:flex space-x-1 border-b border-gray-200"
+>
+  <a
+    href="index.html"
+    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+  >
+    <i class="fas fa-plane mr-2"></i> Flights
+  </a>
+
+  <a
+    href="train.html"
+    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+  >
+    <i class="fas fa-train mr-2"></i> Trains
+  </a>
+
+  <a
+    href="bus.html"
+    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+  >
+    <i class="fas fa-bus-alt mr-2"></i> Buses
+  </a>
+
+  <a
+    href="hotel.html"
+    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+  >
+    <i class="fas fa-hotel mr-2"></i> Hotels
+  </a>
+
+  <a
+    href="cabs.html"
+    class="tab px-6 py-3 text-sm font-semibold transition duration-150 ease-in-out hover:bg-gray-100 rounded-t-lg flex items-center"
+  >
+    <i class="fas fa-taxi mr-2"></i> Cabs
+  </a>
+</nav>
+
+
+        <!-- User Profile/Menu Button (NEW) -->
+        <button
+          onclick="viewUserDashboard()"
+          class="text-gray-600 hover:text-primary-blue p-2 rounded-full transition duration-150 focus:outline-none focus:ring-2 focus:ring-primary-blue"
+        >
+          <i class="fas fa-user-circle text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation Tabs (visible only on mobile) -->
+      <nav
+        id="nav-tabs-mobile"
+        class="md:hidden flex justify-around border-t border-gray-200 bg-white p-2"
+      >
+        <button
+          data-tab="flights"
+          class="tab active flex flex-col items-center p-1 text-xs font-semibold"
+        >
+          <i class="fas fa-plane text-base"></i>
+          <span class="mt-1">Flights</span>
+        </button>
+        <button
+          data-tab="trains"
+          class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
+        >
+          <i class="fas fa-train text-base"></i>
+          <span class="mt-1">Trains</span>
+        </button>
+        <button
+          data-tab="buses"
+          class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
+        >
+          <i class="fas fa-bus-alt text-base"></i>
+          <span class="mt-1">Buses</span>
+        </button>
+        <button
+          data-tab="hotels"
+          class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
+        >
+          <i class="fas fa-hotel text-base"></i>
+          <span class="mt-1">Hotels</span>
+        </button>
+        <button
+          data-tab="cabs"
+          class="tab flex flex-col items-center p-1 text-xs font-semibold text-gray-600"
+        >
+          <i class="fas fa-taxi text-base"></i> <span class="mt-1">Cabs</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main
+      id="main-content-area"
+      class="flex-grow pt-10 pb-20 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-7xl mx-auto">
+        <!-- 1. Search Form Container -->
+        <div
+          id="tab-content-container"
+          class="booking-card bg-white p-6 md:p-10 rounded-xl"
+        >
+          <!-- Flights Search Form (Active by default) -->
+          <div
+            id="flights-content"
+            data-tab-target="flights"
+            class="tab-content"
+          >
+            <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+              Book Your Next Flight
+            </h2>
+
+            <form id="flight-search-form" class="space-y-6">
+              <!-- Origin, Destination & Dates -->
+              <div class="form-grid flex flex-wrap gap-4">
+                <!-- From Field -->
+                <div
+                  class="flex-1 min-w-[200px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="from"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >From</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-plane-departure text-accent-teal mr-2"></i>
+                    <input
+                      type="text"
+                      id="from"
+                      placeholder="Enter Origin City"
+                      value="New York"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none placeholder-gray-400"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- To Field -->
+                <div
+                  class="flex-1 min-w-[200px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="to"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >To</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-plane-arrival text-accent-teal mr-2"></i>
+                    <input
+                      type="text"
+                      id="to"
+                      placeholder="Enter Destination City"
+                      value="New Delhi"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none placeholder-gray-400"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Departure Date -->
+                <div
+                  class="flex-1 min-w-[160px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="dep-date"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >Departure Date</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-calendar-alt text-accent-teal mr-2"></i>
+                    <input
+                      type="date"
+                      id="dep-date"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Return Date -->
+                <div
+                  class="flex-1 min-w-[160px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="ret-date"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >Return Date</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-calendar-alt text-accent-teal mr-2"></i>
+                    <input
+                      type="date"
+                      id="ret-date"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Passengers & Class -->
+              <div class="flex flex-wrap gap-4 items-end">
+                <!-- Passengers Field -->
+                <div
+                  class="w-full sm:w-auto flex-1 min-w-[150px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="passengers"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >Passengers</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-users text-accent-teal mr-2"></i>
+                    <input
+                      type="number"
+                      id="passengers"
+                      min="1"
+                      max="9"
+                      value="1"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none placeholder-gray-400"
+                    />
+                  </div>
+                </div>
+
+                <!-- Class Dropdown -->
+                <div
+                  class="w-full sm:w-auto flex-1 min-w-[150px] border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-white transition duration-150"
+                >
+                  <label
+                    for="class"
+                    class="block text-xs font-semibold text-gray-500 uppercase"
+                    >Class</label
+                  >
+                  <div class="flex items-center mt-1">
+                    <i class="fas fa-chair text-accent-teal mr-2"></i>
+                    <select
+                      id="class"
+                      class="w-full text-lg font-medium bg-transparent focus:outline-none"
+                    >
+                      <option>Economy</option>
+                      <option>Business</option>
+                      <option>First Class</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Search Button -->
+                <div
+                  class="w-full sm:w-auto flex-grow sm:flex-grow-0 min-w-[200px]"
+                >
+                  <button
+                    type="submit"
+                    class="w-full px-8 py-3 bg-accent-teal text-white font-bold rounded-lg shadow-lg hover:bg-primary-blue transition duration-300 transform hover:scale-[1.01]"
+                  >
+                    <i class="fas fa-search mr-2"></i> Search Flights
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Other Tabs Placeholder -->
+          <div
+            id="trains-content"
+            data-tab-target="trains"
+            class="tab-content hidden"
+          >
+            <h2 class="text-3xl font-bold mb-4 text-primary-blue">
+              Train Ticket Booking
+            </h2>
+            <div
+              class="p-8 bg-gray-50 rounded-lg border border-gray-200 text-center"
+            >
+              <i class="fas fa-train text-5xl text-gray-400 mb-4"></i>
+              <p class="text-xl font-medium text-gray-700">
+                This is a demo for the Trains section.
+              </p>
+            </div>
+          </div>
+          <div
+            id="buses-content"
+            data-tab-target="buses"
+            class="tab-content hidden"
+          >
+            <h2 class="text-3xl font-bold mb-4 text-primary-blue">
+              Bus Ticket Booking
+            </h2>
+            <div
+              class="p-8 bg-gray-50 rounded-lg border border-gray-200 text-center"
+            >
+              <i class="fas fa-bus-alt text-5xl text-gray-400 mb-4"></i>
+              <p class="text-xl font-medium text-gray-700">
+                This is a demo for the Buses section.
+              </p>
+            </div>
+          </div>
+          <div
+            id="hotels-content"
+            data-tab-target="hotels"
+            class="tab-content hidden"
+          >
+            <h2 class="text-3xl font-bold mb-4 text-primary-blue">
+              Hotel & Stay Booking
+            </h2>
+            <div
+              class="p-8 bg-gray-50 rounded-lg border border-gray-200 text-center"
+            >
+              <i class="fas fa-hotel text-5xl text-gray-400 mb-4"></i>
+              <p class="text-xl font-medium text-gray-700">
+                This is a demo for the Hotels section.
+              </p>
+            </div>
+          </div>
+          <div
+            id="cabs-content"
+            data-tab-target="cabs"
+            class="tab-content hidden"
+          >
+            <h2 class="text-3xl font-bold mb-4 text-primary-blue">
+              Cab & Car Rental
+            </h2>
+            <div
+              class="p-8 bg-gray-50 rounded-lg border border-gray-200 text-center"
+            >
+              <i class="fas fa-taxi text-5xl text-gray-400 mb-4"></i>
+              <p class="text-xl font-medium text-gray-700">
+                This is a demo for the Cabs section.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Flight Search Results Container -->
+        <div id="flight-results-container" class="hidden mt-10">
+          <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+            <i class="fas fa-list-alt mr-2"></i> Search Results: Flights from
+            JFK to DEL
+          </h2>
+
+          <!-- Mock Result 1 -->
+          <div
+            class="bg-white p-6 rounded-xl shadow-lg mb-4 flex flex-col md:flex-row justify-between items-center transition duration-300 hover:ring-2 hover:ring-accent-teal"
+          >
+            <div class="flex items-center space-x-6 w-full md:w-auto">
+              <div class="text-center">
+                <p class="text-lg font-bold">14:30</p>
+                <p class="text-sm text-gray-500">JFK</p>
+              </div>
+              <div class="text-center flex-1">
+                <p class="text-sm text-gray-500 border-b border-dashed">
+                  4h 15m
+                </p>
+                <p class="text-xs text-gray-400 mt-1">Non-stop</p>
+              </div>
+              <div class="text-center">
+                <p class="text-lg font-bold">18:45</p>
+                <p class="text-sm text-gray-500">DEL</p>
+              </div>
+            </div>
+            <div
+              class="mt-4 md:mt-0 text-center md:text-right flex items-center space-x-4"
+            >
+              <p class="text-3xl font-extrabold text-red-600">₹ 8,999</p>
+              <button
+                onclick="viewFlightDetails('JFK', 'DEL', '14:30', '18:45', 'Non-stop', '8999', 'Air India')"
+                class="px-6 py-3 bg-accent-teal text-white font-semibold rounded-lg hover:bg-primary-blue transition duration-200"
+              >
+                Book Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Mock Result 2 -->
+          <div
+            class="bg-white p-6 rounded-xl shadow-lg mb-4 flex flex-col md:flex-row justify-between items-center transition duration-300 hover:ring-2 hover:ring-accent-teal"
+          >
+            <div class="flex items-center space-x-6 w-full md:w-auto">
+              <div class="text-center">
+                <p class="text-lg font-bold">20:00</p>
+                <p class="text-sm text-gray-500">LHR</p>
+              </div>
+              <div class="text-center flex-1">
+                <p class="text-sm text-gray-500 border-b border-dashed">
+                  4h 30m
+                </p>
+                <p class="text-xs text-gray-400 mt-1">1 Stop (DXB)</p>
+              </div>
+              <div class="text-center">
+                <p class="text-lg font-bold">00:30 +1</p>
+                <p class="text-sm text-gray-500">DEL</p>
+              </div>
+            </div>
+            <div
+              class="mt-4 md:mt-0 text-center md:text-right flex items-center space-x-4"
+            >
+              <p class="text-3xl font-extrabold text-red-600">₹ 9,550</p>
+              <button
+                onclick="viewFlightDetails('LHR', 'DEL', '20:00', '00:30 +1', '1 Stop (DXB)', '9550', 'British Airways')"
+                class="px-6 py-3 bg-accent-teal text-white font-semibold rounded-lg hover:bg-primary-blue transition duration-200"
+              >
+                Book Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Back to Search Button -->
+          <div class="text-center mt-8">
+            <button
+              id="back-to-search-results"
+              class="px-6 py-3 border border-primary-blue text-primary-blue font-semibold rounded-lg hover:bg-primary-blue hover:text-white transition duration-200"
+            >
+              <i class="fas fa-chevron-left mr-2"></i> Modify Search
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Flight Detail & Booking Summary Page (Step 2) -->
+        <div id="flight-detail-container" class="hidden mt-10">
+          <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+            <i class="fas fa-info-circle mr-2"></i> Flight Details & Fare
+            Selection
+          </h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Column 1 & 2: Main Details and Fare Selection -->
+            <div class="lg:col-span-2 space-y-6">
+              <!-- Flight Overview Card -->
+              <div
+                class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-accent-teal"
+              >
+                <h3
+                  class="text-xl font-bold text-gray-800 mb-4 flex items-center"
+                >
+                  <i class="fas fa-route mr-3 text-primary-blue"></i>
+                  <span id="detail-route"></span>
+                </h3>
+                <p class="text-sm text-gray-500 mb-4">
+                  Operated by:
+                  <span
+                    id="detail-airline"
+                    class="font-semibold text-gray-700"
+                  ></span>
+                </p>
+
+                <div class="flex justify-between items-center border-t pt-4">
+                  <div class="text-center">
+                    <p
+                      class="text-2xl font-extrabold text-gray-900"
+                      id="detail-dep-time"
+                    ></p>
+                    <p class="text-sm text-gray-500" id="detail-origin"></p>
+                  </div>
+                  <div class="text-center flex-1 mx-4">
+                    <p
+                      class="text-base font-medium text-accent-teal"
+                      id="detail-stops"
+                    ></p>
+                    <div class="h-1 bg-gray-200 rounded-full my-1 relative">
+                      <i
+                        class="fas fa-plane text-primary-blue absolute left-1/2 transform -translate-x-1/2 -top-1.5"
+                      ></i>
+                    </div>
+                    <p class="text-xs text-gray-500">Duration: 4h 15m</p>
+                  </div>
+                  <div class="text-center">
+                    <p
+                      class="text-2xl font-extrabold text-gray-900"
+                      id="detail-arr-time"
+                    ></p>
+                    <p
+                      class="text-sm text-gray-500"
+                      id="detail-destination"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fare Options -->
+              <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                  Choose Your Fare
+                </h3>
+
+                <!-- Fare Option 1: Basic Economy -->
+                <div
+                  id="fare-basic"
+                  class="fare-option border-2 border-primary-blue p-4 rounded-lg mb-3 cursor-pointer transition duration-200 hover:shadow-md bg-blue-50"
+                >
+                  <div class="flex justify-between items-center">
+                    <div class="flex flex-col">
+                      <p class="text-lg font-bold text-primary-blue">
+                        Economy Saver
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        No refunds, minimal flexibility. Carry-on only.
+                      </p>
+                    </div>
+                    <p
+                      class="text-2xl font-extrabold text-red-600"
+                      id="fare-price-basic"
+                    ></p>
+                  </div>
+                </div>
+
+                <!-- Fare Option 2: Flexible Economy -->
+                <div
+                  id="fare-flexible"
+                  class="fare-option border-2 border-gray-200 p-4 rounded-lg cursor-pointer transition duration-200 hover:shadow-md hover:border-accent-teal"
+                >
+                  <div class="flex justify-between items-center">
+                    <div class="flex flex-col">
+                      <p class="text-lg font-bold text-gray-800">
+                        Economy Flex
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        Free change date, 1 checked bag included.
+                      </p>
+                    </div>
+                    <p
+                      class="text-2xl font-extrabold text-red-600"
+                      id="fare-price-flexible"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add-Ons/Ancillaries -->
+              <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                  Optional Add-ons
+                </h3>
+                <div class="space-y-3">
+                  <div
+                    class="flex justify-between items-center p-3 border rounded-lg"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-suitcase text-primary-blue"></i>
+                      <p class="font-medium">Extra Checked Bag (15kg)</p>
+                    </div>
+                    <button
+                      onclick="showMessage('Extra bag added for ₹ 1,500.')"
+                      class="text-accent-teal font-semibold hover:underline"
+                    >
+                      Add (₹ 1,500)
+                    </button>
+                  </div>
+                  <div
+                    class="flex justify-between items-center p-3 border rounded-lg"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-utensils text-primary-blue"></i>
+                      <p class="font-medium">Pre-booked Meal</p>
+                    </div>
+                    <button
+                      onclick="showMessage('Meal selected for ₹ 450.')"
+                      class="text-accent-teal font-semibold hover:underline"
+                    >
+                      Add (₹ 450)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column 3: Price Summary & CTA (Sticky) -->
+            <div class="lg:col-span-1">
+              <div
+                class="sticky top-20 bg-primary-blue text-white p-6 rounded-xl shadow-2xl"
+              >
+                <h3 class="text-2xl font-extrabold mb-4">Booking Summary</h3>
+
+                <div class="space-y-2 border-b border-blue-400 pb-4">
+                  <div class="flex justify-between">
+                    <p>Base Fare (1 Adult)</p>
+                    <p id="summary-base-price">₹ 8,999</p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p>Taxes & Fees</p>
+                    <p>₹ 1,200</p>
+                  </div>
+                  <div class="flex justify-between text-yellow-300">
+                    <p>Flexible Upgrade</p>
+                    <p id="summary-upgrade-price">+ ₹ 0</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                  <p class="text-xl font-bold">Total Payable</p>
+                  <p
+                    class="text-4xl font-extrabold text-yellow-300"
+                    id="summary-total-price"
+                  >
+                    ₹ 10,199
+                  </p>
+                </div>
+
+                <!-- Button to proceed to Passenger Details -->
+                <button
+                  onclick="viewPassengerDetails()"
+                  class="w-full mt-6 py-4 bg-accent-teal text-white font-bold text-xl rounded-lg shadow-xl hover:bg-green-600 transition duration-300 transform hover:scale-[1.02]"
+                >
+                  Proceed to Book <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+
+                <button
+                  onclick="backToSearchResults()"
+                  class="w-full mt-3 py-2 text-sm text-white opacity-80 hover:opacity-100 transition duration-200"
+                >
+                  Change Flight
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Passenger Details & Review Page (Step 3) -->
+        <div id="passenger-details-container" class="hidden mt-10">
+          <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+            <i class="fas fa-user-check mr-2"></i> Passenger Details & Final
+            Review
+          </h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Column 1 & 2: Passenger Form -->
+            <div class="lg:col-span-2 space-y-6">
+              <!-- Passenger Input Card -->
+              <div
+                class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-primary-blue"
+              >
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                  Traveler Information (1 Adult)
+                </h3>
+
+                <form id="passenger-form" class="space-y-6">
+                  <!-- Contact Details -->
+                  <div class="space-y-4 border-b pb-4">
+                    <h4 class="text-lg font-semibold text-accent-teal">
+                      Contact Details
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          for="email"
+                          class="block text-sm font-medium text-gray-700"
+                          >Email Address</label
+                        >
+                        <input
+                          type="email"
+                          id="email"
+                          placeholder="email@example.com"
+                          value="john.doe@example.com"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          for="phone"
+                          class="block text-sm font-medium text-gray-700"
+                          >Phone Number</label
+                        >
+                        <input
+                          type="tel"
+                          id="phone"
+                          placeholder="+91 98765 43210"
+                          value="9876543210"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Passenger 1 -->
+                  <div class="space-y-4 pt-4">
+                    <h4 class="text-lg font-semibold text-accent-teal">
+                      Adult 1 (Primary Traveler)
+                    </h4>
+                    <div class="grid md:grid-cols-3 gap-4">
+                      <div>
+                        <label
+                          for="title"
+                          class="block text-sm font-medium text-gray-700"
+                          >Title</label
+                        >
+                        <select
+                          id="title"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        >
+                          <option>Mr</option>
+                          <option>Ms</option>
+                          <option>Mrs</option>
+                        </select>
+                      </div>
+                      <div class="md:col-span-1">
+                        <label
+                          for="first-name"
+                          class="block text-sm font-medium text-gray-700"
+                          >First Name</label
+                        >
+                        <input
+                          type="text"
+                          id="first-name"
+                          placeholder="First Name"
+                          value="John"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        />
+                      </div>
+                      <div class="md:col-span-1">
+                        <label
+                          for="last-name"
+                          class="block text-sm font-medium text-gray-700"
+                          >Last Name</label
+                        >
+                        <input
+                          type="text"
+                          id="last-name"
+                          placeholder="Last Name"
+                          value="Doe"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          for="dob"
+                          class="block text-sm font-medium text-gray-700"
+                          >Date of Birth</label
+                        >
+                        <input
+                          type="date"
+                          id="dob"
+                          required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 focus:ring-accent-teal focus:border-accent-teal"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Terms and Conditions Checkbox -->
+                  <div class="flex items-start pt-4">
+                    <input
+                      id="terms"
+                      type="checkbox"
+                      checked
+                      required
+                      class="h-4 w-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
+                    />
+                    <label for="terms" class="ml-3 block text-sm text-gray-900">
+                      I agree to the
+                      <a
+                        href="#"
+                        onclick="showMessage('Viewing Terms and Conditions...')"
+                        class="text-primary-blue hover:underline"
+                        >Terms & Conditions</a
+                      >
+                      and Fare Rules.
+                    </label>
+                  </div>
+
+                  <div class="text-right pt-4">
+                    <button
+                      type="submit"
+                      class="px-8 py-3 bg-accent-teal text-white font-bold rounded-lg shadow-lg hover:bg-green-600 transition duration-300 transform hover:scale-[1.01]"
+                    >
+                      Proceed to Payment <i class="fas fa-credit-card ml-2"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Column 3: Final Summary (Sticky) -->
+            <div class="lg:col-span-1">
+              <div
+                class="sticky top-20 bg-primary-blue text-white p-6 rounded-xl shadow-2xl"
+              >
+                <h3
+                  class="text-xl font-extrabold mb-4 border-b border-blue-400 pb-3"
+                >
+                  Booking Summary
+                </h3>
+
+                <!-- Summary of Flight Details -->
+                <div class="mb-4">
+                  <p class="text-lg font-bold" id="final-route-summary">
+                    JFK to DEL
+                  </p>
+                  <p class="text-sm opacity-80" id="final-flight-time-summary">
+                    14:30 - 18:45 | Non-stop
+                  </p>
+                  <p class="text-sm opacity-80" id="final-fare-type-summary">
+                    Fare: Economy Saver
+                  </p>
+                </div>
+
+                <!-- Final Price Breakdown -->
+                <div class="space-y-2 border-t border-b border-blue-400 py-4">
+                  <div class="flex justify-between">
+                    <p>Base Fare (1 Adult)</p>
+                    <p id="final-base-price">₹ 8,999</p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p>Taxes & Fees</p>
+                    <p>₹ 1,200</p>
+                  </div>
+                  <div class="flex justify-between text-yellow-300">
+                    <p>Upgrade/Ancillaries</p>
+                    <p id="final-upgrade-price">+ ₹ 0</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                  <p class="text-xl font-bold">Total Payable</p>
+                  <p
+                    class="text-4xl font-extrabold text-yellow-300"
+                    id="final-total-price"
+                  >
+                    ₹ 10,199
+                  </p>
+                </div>
+
+                <button
+                  onclick="backToFlightDetails()"
+                  class="w-full mt-6 py-2 text-sm text-white opacity-80 hover:opacity-100 transition duration-200"
+                >
+                  <i class="fas fa-chevron-left mr-2"></i> Back to Fare
+                  Selection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Payment Gateway Simulation Page (Step 4) -->
+        <div id="payment-container" class="hidden mt-10">
+          <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+            <i class="fas fa-credit-card mr-2"></i> Secure Payment
+          </h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Column 1 & 2: Payment Options -->
+            <div class="lg:col-span-2 space-y-6">
+              <div
+                class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-accent-teal"
+              >
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                  Select Payment Method
+                </h3>
+
+                <form id="payment-form" class="space-y-4">
+                  <!-- Payment Option 1: Credit/Debit Card -->
+                  <input
+                    type="radio"
+                    id="card"
+                    name="payment-method"
+                    value="Card"
+                    class="hidden payment-option"
+                    checked
+                  />
+                  <label
+                    for="card"
+                    class="block border-2 border-gray-200 p-4 rounded-lg cursor-pointer transition duration-200 hover:shadow-md"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span
+                        class="text-lg font-semibold text-gray-800 flex items-center"
+                      >
+                        <i
+                          class="fas fa-credit-card mr-3 text-primary-blue"
+                        ></i>
+                        Credit / Debit Card
+                      </span>
+                      <div class="flex space-x-2">
+                        <i class="fab fa-cc-visa text-xl text-indigo-600"></i>
+                        <i
+                          class="fab fa-cc-mastercard text-xl text-red-600"
+                        ></i>
+                      </div>
+                    </div>
+                    <div id="card-details" class="mt-4 space-y-3">
+                      <input
+                        type="text"
+                        placeholder="Card Number (e.g., 4111 XXXX XXXX 1234)"
+                        required
+                        class="w-full rounded-md border-gray-300 shadow-sm p-2 text-sm"
+                      />
+                      <div class="grid grid-cols-3 gap-3">
+                        <input
+                          type="text"
+                          placeholder="Expiry (MM/YY)"
+                          required
+                          class="col-span-2 rounded-md border-gray-300 shadow-sm p-2 text-sm"
+                        />
+                        <input
+                          type="text"
+                          placeholder="CVV"
+                          required
+                          class="col-span-1 rounded-md border-gray-300 shadow-sm p-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </label>
+
+                  <!-- Payment Option 2: UPI -->
+                  <input
+                    type="radio"
+                    id="upi"
+                    name="payment-method"
+                    value="UPI"
+                    class="hidden payment-option"
+                  />
+                  <label
+                    for="upi"
+                    class="block border-2 border-gray-200 p-4 rounded-lg cursor-pointer transition duration-200 hover:shadow-md"
+                  >
+                    <span
+                      class="text-lg font-semibold text-gray-800 flex items-center"
+                    >
+                      <i class="fas fa-mobile-alt mr-3 text-green-600"></i> UPI
+                      (Google Pay, PhonePe, Paytm)
+                    </span>
+                    <div id="upi-details" class="hidden mt-4">
+                      <input
+                        type="text"
+                        placeholder="Enter UPI ID (e.g., user@bank)"
+                        class="w-full rounded-md border-gray-300 shadow-sm p-2 text-sm"
+                      />
+                    </div>
+                  </label>
+
+                  <!-- Payment Option 3: Netbanking -->
+                  <input
+                    type="radio"
+                    id="netbanking"
+                    name="payment-method"
+                    value="Netbanking"
+                    class="hidden payment-option"
+                  />
+                  <label
+                    for="netbanking"
+                    class="block border-2 border-gray-200 p-4 rounded-lg cursor-pointer transition duration-200 hover:shadow-md"
+                  >
+                    <span
+                      class="text-lg font-semibold text-gray-800 flex items-center"
+                    >
+                      <i class="fas fa-university mr-3 text-red-700"></i>
+                      Netbanking
+                    </span>
+                    <div id="netbanking-details" class="hidden mt-4">
+                      <select
+                        class="w-full rounded-md border-gray-300 shadow-sm p-2 text-sm"
+                      >
+                        <option>Select Your Bank</option>
+                        <option>State Bank of India</option>
+                        <option>HDFC Bank</option>
+                        <option>ICICI Bank</option>
+                      </select>
+                    </div>
+                  </label>
+
+                  <!-- Pay Button -->
+                  <div class="pt-6">
+                    <button
+                      type="submit"
+                      id="pay-now-button"
+                      class="w-full py-4 bg-red-600 text-white font-bold text-xl rounded-lg shadow-xl hover:bg-red-700 transition duration-300 transform hover:scale-[1.01]"
+                    >
+                      <i class="fas fa-lock mr-2"></i> Pay Now: ₹ 10,199
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Column 3: Summary (Sticky) -->
+            <div class="lg:col-span-1">
+              <div
+                class="sticky top-20 bg-primary-blue text-white p-6 rounded-xl shadow-2xl"
+              >
+                <h3
+                  class="text-xl font-extrabold mb-4 border-b border-blue-400 pb-3"
+                >
+                  Amount Due
+                </h3>
+
+                <div class="flex justify-between items-center pt-4">
+                  <p class="text-xl font-bold">Total Payable</p>
+                  <p
+                    class="text-4xl font-extrabold text-yellow-300"
+                    id="payment-total-price"
+                  >
+                    ₹ 10,199
+                  </p>
+                </div>
+
+                <p
+                  class="text-sm opacity-80 mt-4 border-t border-blue-400 pt-3"
+                >
+                  <i class="fas fa-shield-alt mr-2 text-yellow-300"></i> Your
+                  payment is secure and encrypted.
+                </p>
+
+                <button
+                  onclick="backToPassengerDetails()"
+                  class="w-full mt-6 py-2 text-sm text-white opacity-80 hover:opacity-100 transition duration-200"
+                >
+                  <i class="fas fa-chevron-left mr-2"></i> Back to Passenger
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Booking Confirmation Page (Step 5) -->
+        <div id="confirmation-container" class="hidden mt-10">
+          <div
+            class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-2xl text-center border-t-8 border-accent-teal"
+          >
+            <i
+              class="fas fa-check-circle text-6xl text-accent-teal mb-6 animate-pulse"
+            ></i>
+            <h2 class="text-4xl font-extrabold text-primary-blue mb-4">
+              Booking Confirmed!
+            </h2>
+            <p class="text-xl text-gray-700 mb-8">
+              Thank you for booking with JourneyEase.
+            </p>
+
+            <div
+              class="space-y-4 text-left border-t border-b py-6 mb-8 bg-gray-50 rounded-lg p-4"
+            >
+              <p
+                class="text-lg font-semibold flex justify-between items-center"
+              >
+                Booking ID:
+                <span
+                  id="conf-booking-id"
+                  class="text-accent-teal font-extrabold"
+                  >JE12345678</span
+                >
+              </p>
+              <p
+                class="text-lg font-semibold flex justify-between items-center"
+              >
+                Total Paid:
+                <span id="conf-total-paid" class="text-red-600 font-extrabold"
+                  >₹ 10,199</span
+                >
+              </p>
+              <p
+                class="text-lg font-semibold flex justify-between items-center"
+              >
+                Flight:
+                <span id="conf-flight-route" class="font-normal text-gray-700"
+                  >Air India (JFK to DEL)</span
+                >
+              </p>
+              <p
+                class="text-lg font-semibold flex justify-between items-center"
+              >
+                Departure:
+                <span id="conf-flight-time" class="font-normal text-gray-700"
+                  >14:30 on 2024-12-01</span
+                >
+              </p>
+            </div>
+
+            <p class="text-gray-600">
+              A confirmation email has been sent to
+              <span id="conf-email" class="font-semibold text-primary-blue"
+                >john.doe@example.com</span
+              >.
+            </p>
+
+            <button
+              onclick="viewUserDashboard()"
+              class="mt-8 mr-4 px-8 py-3 bg-primary-blue text-white font-bold rounded-lg hover:bg-accent-teal transition duration-300"
+            >
+              <i class="fas fa-user-circle mr-2"></i> View My Dashboard
+            </button>
+
+            <button
+              onclick="backToSearchForm()"
+              class="mt-8 px-8 py-3 border border-primary-blue text-primary-blue font-bold rounded-lg hover:bg-primary-blue hover:text-white transition duration-300"
+            >
+              <i class="fas fa-search mr-2"></i> Search Again
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. NEW: User Dashboard/Profile Page -->
+        <div id="dashboard-container" class="hidden mt-10">
+          <h2 class="text-3xl font-bold mb-6 text-primary-blue">
+            <i class="fas fa-user-circle mr-2"></i> My Dashboard
+          </h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="lg:col-span-1">
+              <div
+                class="bg-white p-6 rounded-xl shadow-lg space-y-2 sticky top-20"
+              >
+                <button
+                  data-dashboard-tab="bookings"
+                  class="dashboard-tab w-full text-left p-3 rounded-lg bg-gray-100 text-primary-blue font-semibold flex items-center hover:bg-gray-200 transition duration-150"
+                >
+                  <i class="fas fa-ticket-alt mr-3"></i> My Bookings
+                </button>
+                <button
+                  data-dashboard-tab="profile"
+                  class="dashboard-tab w-full text-left p-3 rounded-lg text-gray-700 font-semibold flex items-center hover:bg-gray-100 transition duration-150"
+                >
+                  <i class="fas fa-address-card mr-3"></i> Profile Details
+                </button>
+                <button
+                  data-dashboard-tab="payments"
+                  class="dashboard-tab w-full text-left p-3 rounded-lg text-gray-700 font-semibold flex items-center hover:bg-gray-100 transition duration-150"
+                >
+                  <i class="fas fa-wallet mr-3"></i> Saved Payments
+                </button>
+                <button
+                  onclick="showMessage('You have been logged out.')"
+                  class="w-full text-left p-3 rounded-lg text-red-600 font-semibold flex items-center hover:bg-red-50 transition duration-150"
+                >
+                  <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                </button>
+              </div>
+            </div>
+
+            <!-- Main Dashboard Content -->
+            <div class="lg:col-span-2 space-y-6">
+              <!-- Bookings Tab Content (Active by default) -->
+              <div
+                id="dashboard-bookings"
+                data-dashboard-target="bookings"
+                class="dashboard-content bg-white p-6 rounded-xl shadow-lg"
+              >
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
+                  Upcoming & Past Bookings
+                </h3>
+
+                <!-- Current Booking from Confirmation Page -->
+                <div
+                  class="border-2 border-accent-teal rounded-xl p-4 mb-4 shadow-md bg-green-50"
+                >
+                  <div class="flex justify-between items-center mb-2">
+                    <p class="text-lg font-bold text-accent-teal">
+                      Upcoming Flight - <span id="dash-route">JFK to DEL</span>
+                    </p>
+                    <span
+                      class="text-sm font-semibold text-white bg-accent-teal px-3 py-1 rounded-full"
+                      >CONFIRMED</span
+                    >
+                  </div>
+                  <p class="text-sm text-gray-600 mb-2">
+                    Booking ID: <span id="dash-booking-id">JE12345678</span> |
+                    Departure:
+                    <span id="dash-dep-time">14:30 on 2024-12-01</span>
+                  </p>
+                  <div
+                    class="flex justify-between items-center pt-2 border-t mt-2"
+                  >
+                    <p class="text-xl font-extrabold text-red-600">₹ 10,199</p>
+                    <button
+                      onclick="showMessage('Viewing PNR details...')"
+                      class="text-primary-blue hover:underline font-semibold"
+                    >
+                      View Details
+                      <i class="fas fa-external-link-alt ml-1 text-sm"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Mock Past Booking -->
+                <div
+                  class="border border-gray-200 rounded-xl p-4 mb-4 shadow-sm"
+                >
+                  <div class="flex justify-between items-center mb-2">
+                    <p class="text-lg font-bold text-gray-700">
+                      Past Flight - DXB to SFO
+                    </p>
+                    <span
+                      class="text-sm font-semibold text-white bg-gray-500 px-3 py-1 rounded-full"
+                      >COMPLETED</span
+                    >
+                  </div>
+                  <p class="text-sm text-gray-600 mb-2">
+                    Booking ID: JE98765432 | Departure: 08:00 on 2024-06-15
+                  </p>
+                  <div
+                    class="flex justify-between items-center pt-2 border-t mt-2"
+                  >
+                    <p class="text-xl font-extrabold text-gray-600">₹ 15,200</p>
+                    <button
+                      onclick="showMessage('Viewing past itinerary...')"
+                      class="text-primary-blue hover:underline font-semibold"
+                    >
+                      View Invoice
+                      <i class="fas fa-file-invoice ml-1 text-sm"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Profile Tab Content -->
+              <div
+                id="dashboard-profile"
+                data-dashboard-target="profile"
+                class="dashboard-content bg-white p-6 rounded-xl shadow-lg hidden"
+              >
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
+                  Personal Information
+                </h3>
+
+                <form class="space-y-4">
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700"
+                        >First Name</label
+                      >
+                      <input
+                        type="text"
+                        value="John"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700"
+                        >Last Name</label
+                      >
+                      <input
+                        type="text"
+                        value="Doe"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 bg-gray-100"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700"
+                      >Email Address</label
+                    >
+                    <input
+                      type="email"
+                      value="john.doe@example.com"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 bg-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700"
+                      >Phone Number</label
+                    >
+                    <input
+                      type="tel"
+                      value="+91 98765 43210"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 bg-gray-100"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    onclick="showMessage('Profile updated successfully!')"
+                    class="w-full mt-4 py-3 bg-primary-blue text-white font-bold rounded-lg hover:bg-accent-teal transition duration-300"
+                  >
+                    Save Changes
+                  </button>
+                </form>
+              </div>
+
+              <!-- Payments Tab Content -->
+              <div
+                id="dashboard-payments"
+                data-dashboard-target="payments"
+                class="dashboard-content bg-white p-6 rounded-xl shadow-lg hidden"
+              >
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
+                  Saved Payment Methods
+                </h3>
+
+                <div class="space-y-4">
+                  <!-- Saved Card 1 -->
+                  <div
+                    class="border border-gray-300 rounded-xl p-4 flex justify-between items-center"
+                  >
+                    <div class="flex items-center space-x-4">
+                      <i class="fab fa-cc-visa text-3xl text-indigo-600"></i>
+                      <div>
+                        <p class="font-semibold">Visa ending in 4123</p>
+                        <p class="text-sm text-gray-500">
+                          Expires 10/26 | Primary
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onclick="showMessage('Card 4123 removed.')"
+                      class="text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <!-- Saved UPI -->
+                  <div
+                    class="border border-gray-300 rounded-xl p-4 flex justify-between items-center"
+                  >
+                    <div class="flex items-center space-x-4">
+                      <i class="fas fa-mobile-alt text-3xl text-green-600"></i>
+                      <div>
+                        <p class="font-semibold">UPI ID</p>
+                        <p class="text-sm text-gray-500">john.doe@upi</p>
+                      </div>
+                    </div>
+                    <button
+                      onclick="showMessage('UPI ID removed.')"
+                      class="text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <button
+                    onclick="showMessage('Adding new payment method...')"
+                    class="w-full mt-4 py-3 border border-dashed border-gray-400 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition duration-300"
+                  >
+                    <i class="fas fa-plus mr-2"></i> Add New Method
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Promotional Content (Example) - Keep at the bottom -->
+        <div id="promo-section" class="mt-10 grid md:grid-cols-3 gap-6">
+          <div
+            class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition duration-300"
+          >
+            <i class="fas fa-tags text-2xl text-accent-teal mb-3"></i>
+            <h3 class="font-bold text-lg text-gray-800">Exclusive Deals</h3>
+            <p class="text-gray-600 text-sm mt-1">
+              Get up to 30% off on all first-time flight bookings.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition duration-300"
+          >
+            <i class="fas fa-headset text-2xl text-accent-teal mb-3"></i>
+            <h3 class="font-bold text-lg text-gray-800">24/7 Support</h3>
+            <p class="text-gray-600 text-sm mt-1">
+              Dedicated customer service available round the clock.
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition duration-300"
+          >
+            <i class="fas fa-shield-alt text-2xl text-accent-teal mb-3"></i>
+            <h3 class="font-bold text-lg text-gray-800">Secure Payments</h3>
+            <p class="text-gray-600 text-sm mt-1">
+              Your data and transactions are always protected.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm"
+      >
+        <p>
+          &copy; <span id="current-year"></span> JourneyEase Travel Demo. All
+          rights reserved.
+        </p>
+        <p class="mt-1 text-gray-400">
+          Powered by the imagination of modern travel.
+        </p>
+      </div>
+    </footer>
+
+    <!-- JavaScript for Tab Switching and Form Handling -->
+    <script>
+      // --- Global State and Utility Functions ---
+      let currentBaseFare = 0;
+      let currentTotalFare = 0;
+      let currentUpgradeCost = 0;
+      let selectedFlight = {
+        origin: "JFK",
+        destination: "DEL",
+        depTime: "14:30",
+        arrTime: "18:45",
+        stops: "Non-stop",
+        price: 8999,
+        airline: "Air India",
+        fareType: "Economy Saver",
+      }; // Initialize for dashboard demo
+      let travelerContact = {
+        email: "john.doe@example.com",
+        phone: "9876543210",
+        firstName: "John",
+        lastName: "Doe",
+      }; // Initialize for dashboard demo
+      let latestBooking = {
+        id: "JE12345678",
+        route: "JFK to DEL",
+        total: 10199,
+        depTime: "14:30",
+        depDate: "2024-12-01",
+      };
+
+      const taxesAndFees = 1200; // Fixed mock tax amount
+      const flexibleUpgradePrice = 500; // Fixed mock upgrade price
+
+      // Function to display custom message box (replaces alert/confirm)
+      function showMessage(message, isError = false) {
+        const box = document.getElementById("message-box");
+        const content = document.getElementById("message-content");
+
+        // Reset classes
+        box.classList.remove(
+          "hidden",
+          "scale-95",
+          "opacity-0",
+          "bg-red-600",
+          "bg-accent-teal"
+        );
+
+        // Set message and style
+        content.textContent = message;
+        box.classList.add(isError ? "bg-red-600" : "bg-accent-teal");
+        box.classList.add("scale-100", "opacity-100");
+
+        setTimeout(() => {
+          box.classList.remove("scale-100", "opacity-100");
+          box.classList.add("scale-95", "opacity-0");
+          setTimeout(() => box.classList.add("hidden"), 300);
+        }, 3000);
+      }
+      window.showMessage = showMessage; // Expose globally
+
+      // --- Navigation Functions ---
+      const searchCard = document.getElementById("tab-content-container");
+      const resultsContainer = document.getElementById(
+        "flight-results-container"
+      );
+      const detailContainer = document.getElementById(
+        "flight-detail-container"
+      );
+      const passengerContainer = document.getElementById(
+        "passenger-details-container"
+      );
+      const paymentContainer = document.getElementById("payment-container");
+      const confirmationContainer = document.getElementById(
+        "confirmation-container"
+      );
+      const dashboardContainer = document.getElementById("dashboard-container"); // NEW
+      const promoSection = document.getElementById("promo-section");
+
+      const allContainers = [
+        searchCard,
+        resultsContainer,
+        detailContainer,
+        passengerContainer,
+        paymentContainer,
+        confirmationContainer,
+        dashboardContainer,
+      ];
+
+      function hideAll() {
+        allContainers.forEach((container) => {
+          if (container) container.classList.add("hidden");
+        });
+        promoSection.classList.remove("hidden");
+      }
+
+      function showContainer(containerToShow) {
+        hideAll();
+        containerToShow.classList.remove("hidden");
+        containerToShow.scrollIntoView({ behavior: "smooth" });
+      }
+
+      // --- Step-based Navigation ---
+
+      function showResultsPage() {
+        showContainer(resultsContainer);
+      }
+
+      function backToSearchForm() {
+        showContainer(searchCard);
+        // Ensure the flights tab is visually active when returning home
+        switchTab("flights");
+      }
+      window.backToSearchForm = backToSearchForm; // Expose globally
+
+      function backToSearchResults() {
+        showContainer(resultsContainer);
+      }
+      window.backToSearchResults = backToSearchResults; // Expose globally
+
+      function backToFlightDetails() {
+        showContainer(detailContainer);
+      }
+      window.backToFlightDetails = backToFlightDetails; // Expose globally
+
+      function backToPassengerDetails() {
+        showContainer(passengerContainer);
+      }
+      window.backToPassengerDetails = backToPassengerDetails; // Expose globally
+
+      // --- Dashboard Navigation (NEW) ---
+      function viewUserDashboard() {
+        showContainer(dashboardContainer);
+        promoSection.classList.add("hidden"); // Hide promos on profile page
+
+        // Populate latest booking details
+        document.getElementById("dash-booking-id").textContent =
+          latestBooking.id;
+        document.getElementById("dash-route").textContent = latestBooking.route;
+        document.getElementById(
+          "dash-dep-time"
+        ).textContent = `${latestBooking.depTime} on ${latestBooking.depDate}`;
+
+        // Set default tab to Bookings
+        switchDashboardTab("bookings");
+      }
+      window.viewUserDashboard = viewUserDashboard; // Expose globally
+
+      function switchDashboardTab(targetTab) {
+        document.querySelectorAll(".dashboard-tab").forEach((btn) => {
+          btn.classList.remove("bg-gray-100", "text-primary-blue");
+          btn.classList.add("text-gray-700");
+        });
+
+        document.querySelectorAll(".dashboard-content").forEach((content) => {
+          content.classList.add("hidden");
+        });
+
+        // Find and activate the selected tab and content
+        document
+          .querySelector(`[data-dashboard-tab="${targetTab}"]`)
+          .classList.add("bg-gray-100", "text-primary-blue");
+        document
+          .querySelector(`[data-dashboard-target="${targetTab}"]`)
+          .classList.remove("hidden");
+      }
+
+      // --- Detail Page Logic (Step 2) ---
+
+      function viewFlightDetails(
+        origin,
+        destination,
+        depTime,
+        arrTime,
+        stops,
+        price,
+        airline
+      ) {
+        // 1. Show Flight Detail Container and store data
+        selectedFlight = {
+          origin,
+          destination,
+          depTime,
+          arrTime,
+          stops,
+          price: parseInt(price, 10),
+          airline,
+          fareType: "Economy Saver",
+        };
+        currentBaseFare = selectedFlight.price;
+        currentUpgradeCost = 0;
+        showContainer(detailContainer);
+
+        // 2. Populate Flight Details
+        document.getElementById(
+          "detail-route"
+        ).textContent = `Flying from ${origin} to ${destination}`;
+        document.getElementById("detail-origin").textContent = origin;
+        document.getElementById("detail-destination").textContent = destination;
+        document.getElementById("detail-dep-time").textContent = depTime;
+        document.getElementById("detail-arr-time").textContent = arrTime;
+        document.getElementById("detail-stops").textContent = stops;
+        document.getElementById("detail-airline").textContent = airline;
+
+        // 3. Set Base and Flexible Fare Prices
+        const basicPrice = currentBaseFare;
+        const flexiblePrice = currentBaseFare + flexibleUpgradePrice;
+
+        document.getElementById(
+          "fare-price-basic"
+        ).textContent = `₹ ${basicPrice.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "fare-price-flexible"
+        ).textContent = `₹ ${flexiblePrice.toLocaleString("en-IN")}`;
+
+        // 4. Set initial summary (Basic Economy selected by default)
+        updateSummary(basicPrice, 0);
+
+        // 5. Add Fare Selection Listeners
+        const basicFareEl = document.getElementById("fare-basic");
+        const flexibleFareEl = document.getElementById("fare-flexible");
+
+        // Re-apply visual selection for Basic Saver as default
+        basicFareEl.classList.add("border-primary-blue", "bg-blue-50");
+        basicFareEl.classList.remove("border-gray-200");
+        flexibleFareEl.classList.remove("border-primary-blue", "bg-blue-50");
+        flexibleFareEl.classList.add("border-gray-200");
+
+        // Add new listeners
+        basicFareEl.onclick = () =>
+          handleFareSelection(
+            basicFareEl,
+            flexibleFareEl,
+            basicPrice,
+            0,
+            "Economy Saver"
+          );
+        flexibleFareEl.onclick = () =>
+          handleFareSelection(
+            flexibleFareEl,
+            basicFareEl,
+            flexiblePrice,
+            flexibleUpgradePrice,
+            "Economy Flex"
+          );
+      }
+      window.viewFlightDetails = viewFlightDetails; // Expose globally
+
+      function handleFareSelection(
+        selectedEl,
+        unselectedEl,
+        newBaseFare,
+        upgradeCost,
+        fareType
+      ) {
+        // Update visual selection
+        selectedEl.classList.add("border-primary-blue", "bg-blue-50");
+        selectedEl.classList.remove("border-gray-200");
+        unselectedEl.classList.remove("border-primary-blue", "bg-blue-50");
+        unselectedEl.classList.add("border-gray-200");
+
+        // Update state and summary
+        currentBaseFare = newBaseFare;
+        currentUpgradeCost = upgradeCost;
+        selectedFlight.fareType = fareType;
+        updateSummary(currentBaseFare, currentUpgradeCost);
+      }
+
+      function updateSummary(basePrice, upgradeCost) {
+        currentTotalFare = basePrice + taxesAndFees + upgradeCost;
+
+        document.getElementById(
+          "summary-base-price"
+        ).textContent = `₹ ${basePrice.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "summary-upgrade-price"
+        ).textContent = `+ ₹ ${upgradeCost.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "summary-total-price"
+        ).textContent = `₹ ${currentTotalFare.toLocaleString("en-IN")}`;
+      }
+
+      // --- Passenger Details Logic (Step 3) ---
+
+      function viewPassengerDetails() {
+        // 1. Show passenger view
+        showContainer(passengerContainer);
+
+        // 2. Populate Final Summary Panel
+        document.getElementById(
+          "final-route-summary"
+        ).textContent = `${selectedFlight.origin} to ${selectedFlight.destination} (${selectedFlight.airline})`;
+        document.getElementById(
+          "final-flight-time-summary"
+        ).textContent = `${selectedFlight.depTime} - ${selectedFlight.arrTime} | ${selectedFlight.stops}`;
+        document.getElementById(
+          "final-fare-type-summary"
+        ).textContent = `Fare: ${selectedFlight.fareType}`;
+
+        document.getElementById(
+          "final-base-price"
+        ).textContent = `₹ ${currentBaseFare.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "final-upgrade-price"
+        ).textContent = `+ ₹ ${currentUpgradeCost.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "final-total-price"
+        ).textContent = `₹ ${currentTotalFare.toLocaleString("en-IN")}`;
+
+        // 3. Add listener for passenger form submission
+        const passengerForm = document.getElementById("passenger-form");
+        passengerForm.onsubmit = (e) => {
+          e.preventDefault();
+          // Capture passenger and contact info
+          travelerContact = {
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            firstName: document.getElementById("first-name").value,
+            lastName: document.getElementById("last-name").value,
+          };
+          viewPaymentPage();
+        };
+      }
+      window.viewPassengerDetails = viewPassengerDetails; // Expose globally
+
+      // --- Payment Page Logic (Step 4) ---
+
+      function viewPaymentPage() {
+        showContainer(paymentContainer);
+
+        // Update Price on Payment Page
+        const totalFormatted = currentTotalFare.toLocaleString("en-IN");
+        document.getElementById(
+          "payment-total-price"
+        ).textContent = `₹ ${totalFormatted}`;
+        document.getElementById(
+          "pay-now-button"
+        ).innerHTML = `<i class="fas fa-lock mr-2"></i> Pay Now: ₹ ${totalFormatted}`;
+
+        // Add listener for payment form submission
+        const paymentForm = document.getElementById("payment-form");
+        paymentForm.onsubmit = (e) => {
+          e.preventDefault();
+          simulatePayment();
+        };
+
+        // Add listeners for radio buttons to toggle visibility
+        document
+          .querySelectorAll('input[name="payment-method"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", () => {
+              document.getElementById("card-details").classList.add("hidden");
+              document.getElementById("upi-details").classList.add("hidden");
+              document
+                .getElementById("netbanking-details")
+                .classList.add("hidden");
+
+              if (document.getElementById("card").checked) {
+                document
+                  .getElementById("card-details")
+                  .classList.remove("hidden");
+              } else if (document.getElementById("upi").checked) {
+                document
+                  .getElementById("upi-details")
+                  .classList.remove("hidden");
+              } else if (document.getElementById("netbanking").checked) {
+                document
+                  .getElementById("netbanking-details")
+                  .classList.remove("hidden");
+              }
+            });
+          });
+        // Trigger change event once to show default card details
+        document.getElementById("card").dispatchEvent(new Event("change"));
+      }
+
+      function simulatePayment() {
+        const payButton = document.getElementById("pay-now-button");
+        const originalHtml = payButton.innerHTML;
+
+        // Simple check to ensure card number is entered (for the active card method)
+        if (
+          document.getElementById("card").checked &&
+          !document.querySelector('#card-details input[type="text"]').value
+        ) {
+          showMessage("Please enter a mock card number for payment.", true);
+          return;
+        }
+
+        // Simulate payment processing
+        payButton.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i> Processing Payment...';
+        payButton.disabled = true;
+
+        setTimeout(() => {
+          // Restore button
+          payButton.innerHTML = originalHtml;
+          payButton.disabled = false;
+
+          // Show confirmation page
+          viewConfirmationPage();
+        }, 2500); // 2.5 second delay
+      }
+
+      // --- Confirmation Page Logic (Step 5) ---
+      function viewConfirmationPage() {
+        showContainer(confirmationContainer);
+        promoSection.classList.add("hidden"); // Hide promos on confirmation
+
+        // Update latest booking global state
+        const depDateInput =
+          document.getElementById("dep-date").value || "2024-12-01"; // Fallback if user didn't pick date
+        const bookingId =
+          "JE" + Math.floor(10000000 + Math.random() * 90000000);
+
+        latestBooking = {
+          id: bookingId,
+          route: `${selectedFlight.origin} to ${selectedFlight.destination}`,
+          total: currentTotalFare,
+          depTime: selectedFlight.depTime,
+          depDate: depDateInput,
+        };
+
+        // Populate Confirmation details
+        document.getElementById("conf-booking-id").textContent =
+          latestBooking.id;
+        document.getElementById(
+          "conf-total-paid"
+        ).textContent = `₹ ${latestBooking.total.toLocaleString("en-IN")}`;
+        document.getElementById(
+          "conf-flight-route"
+        ).textContent = `${selectedFlight.airline} (${latestBooking.route})`;
+        document.getElementById(
+          "conf-flight-time"
+        ).textContent = `${latestBooking.depTime} on ${latestBooking.depDate}`;
+        document.getElementById("conf-email").textContent =
+          travelerContact.email || "the provided email address";
+      }
+
+      // --- Initial Load & Event Listeners ---
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get all navigation buttons and content sections
+        const navTabs = document.querySelectorAll(".tab");
+        const tabContents = document.querySelectorAll(".tab-content");
+        const dashboardTabs = document.querySelectorAll(".dashboard-tab");
+
+        // New Elements for Results Page
+        const flightForm = document.getElementById("flight-search-form");
+        const backToSearchButton = document.getElementById(
+          "back-to-search-results"
+        );
+
+        // Set the current year in the footer
+        document.getElementById("current-year").textContent =
+          new Date().getFullYear();
+
+        // Function to handle main tab switching (Flights, Trains, etc.)
+        function switchTab(targetTab) {
+          // 1. Deactivate all tabs and hide all content
+          navTabs.forEach((tab) => tab.classList.remove("active"));
+          navTabs.forEach((tab) => {
+            if (tab.closest("#nav-tabs-mobile")) {
+              tab.classList.add("text-gray-600");
+            }
+          });
+          tabContents.forEach((content) => content.classList.add("hidden"));
+
+          // 2. Find and activate the selected tab buttons (desktop and mobile)
+          navTabs.forEach((tab) => {
+            if (tab.getAttribute("data-tab") === targetTab) {
+              tab.classList.add("active");
+              if (tab.closest("#nav-tabs-mobile")) {
+                tab.classList.remove("text-gray-600");
+              }
+            }
+          });
+
+          // 3. Show the corresponding content
+          const activeContent = document.querySelector(
+            `[data-tab-target="${targetTab}"]`
+          );
+          if (activeContent) {
+            activeContent.classList.remove("hidden");
+          }
+        }
+
+        // Add click listeners to all main tab buttons
+        navTabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const targetTab = tab.getAttribute("data-tab");
+            // When switching tabs, ensure we are back to the search form
+            backToSearchForm();
+            switchTab(targetTab);
+          });
+        });
+
+        // Add click listeners to dashboard tabs
+        dashboardTabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const targetTab = tab.getAttribute("data-dashboard-tab");
+            switchDashboardTab(targetTab);
+          });
+        });
+
+        // ----------------------------------------------------
+        // Handle Flight Search Form Submission
+        // ----------------------------------------------------
+        if (flightForm) {
+          flightForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            // Simple validation check
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+            const depDate = document.getElementById("dep-date").value;
+            if (!from || !to || !depDate) {
+              showMessage(
+                "Please fill in Origin, Destination, and Departure Date.",
+                true
+              );
+              return;
+            }
+
+            // 1. Simulate Loading/Search
+            const searchButton = flightForm.querySelector(
+              'button[type="submit"]'
+            );
+            const originalHtml = searchButton.innerHTML;
+
+            searchButton.innerHTML =
+              '<i class="fas fa-spinner fa-spin mr-2"></i> Searching...';
+            searchButton.disabled = true;
+
+            // 2. Simulate API call delay
+            setTimeout(() => {
+              // 3. Show Results Page
+              showResultsPage();
+
+              // 4. Restore button state
+              searchButton.innerHTML = originalHtml;
+              searchButton.disabled = false;
+            }, 1500); // 1.5 second delay
+          });
+        }
+
+        // ----------------------------------------------------
+        // Handle Back to Search Button (from results page)
+        // ----------------------------------------------------
+        if (backToSearchButton) {
+          backToSearchButton.addEventListener("click", () => {
+            backToSearchForm();
+            switchTab("flights"); // Ensure flight tab is active when returning
+          });
+        }
+        // ----------------------------------------------------
+
+        // Ensure the initial state is correct (Flights tab is active on load)
+        switchTab("flights");
+      });
+    </script>
+  </body>
+</html>

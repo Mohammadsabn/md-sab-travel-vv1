@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftRide - Integrated Travel</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Custom styles for the app container - Simplified background */
+        #app-container {
+            transition: background-color 0.5s ease-in-out;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+
+        /* Content Card (Uniform simple white background) */
+        .content-card-base {
+            background-color: #ffffff; /* Simple white */
+            max-width: 900px; 
+            width: 95%;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+            transition: background-color 0.5s ease-in-out;
+        }
+
+        /* Inter font for modern look */
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Map simulation (Placeholder for visual appeal) */
+        #map-simulation {
+            background-image: url('https://placehold.co/800x400/3b82f6/ffffff?text=Live+Map+Tracking'); /* Blue map placeholder */
+            background-size: cover;
+            background-position: center;
+            border-radius: 0.75rem;
+            height: 300px; /* Make map slightly taller */
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Driver icon on map simulation */
+        .driver-marker {
+            position: absolute;
+            top: 70%;
+            left: 20%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* User location icon on map simulation */
+        .user-marker {
+            position: absolute;
+            top: 35%;
+            left: 70%;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        /* Custom radio card selection */
+        .radio-card input:checked + label {
+            border-color: #4f46e5; /* indigo-600 */
+            background-color: #eef2ff; /* indigo-50 */
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div id="app-container" class="bg-gray-200">
+
+    <!-- Navigation Bar (Redesigned to single row: Tabs Left, Logo Right) -->
+    <nav class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                
+                <!-- LEFT SIDE: Core Services (Tabs) -->
+                <div class="flex space-x-4 sm:space-x-6 items-center flex-wrap">
+  <!-- Flights -->
+  <a href="index.html"
+     class="nav-tab text-base font-medium transition duration-150 ease-in-out flex items-center pb-1 text-gray-600 hover:text-indigo-700 hover:border-indigo-300 border-transparent border-b-2">
+    <i data-lucide="plane" class="w-5 h-5 mr-1"></i>
+    Flights
+  </a>
+
+  <!-- Train -->
+  <a href="train.html"
+     class="nav-tab text-base font-medium transition duration-150 ease-in-out flex items-center pb-1 text-gray-600 hover:text-indigo-700 hover:border-indigo-300 border-transparent border-b-2">
+    <i data-lucide="train-front" class="w-5 h-5 mr-1"></i>
+    Train
+  </a>
+
+  <!-- Bus -->
+  <a href="bus.html"
+     class="nav-tab text-base font-medium transition duration-150 ease-in-out flex items-center pb-1 text-gray-600 hover:text-indigo-700 hover:border-indigo-300 border-transparent border-b-2">
+    <i data-lucide="bus" class="w-5 h-5 mr-1"></i>
+    Bus
+  </a>
+
+  <!-- Hotel -->
+  <a href="hotel.html"
+     class="nav-tab text-base font-medium transition duration-150 ease-in-out flex items-center pb-1 text-gray-600 hover:text-indigo-700 hover:border-indigo-300 border-transparent border-b-2">
+    <i data-lucide="hotel" class="w-5 h-5 mr-1"></i>
+    Hotel
+  </a>
+
+  <!-- Active Tab (Cabs) -->
+  <a href="cabs.html"
+     class="nav-tab text-base font-medium transition duration-150 ease-in-out flex items-center pb-1 border-indigo-600 text-indigo-700 font-bold border-b-2">
+    <i data-lucide="car" class="w-5 h-5 mr-1"></i>
+    Cabs
+  </a>
+</div>
+
+
+                <!-- RIGHT SIDE: Logo (moved from left) -->
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <i data-lucide="car-taxi-front" class="text-indigo-600 text-3xl h-8 w-8"></i>
+                    <h1 class="text-3xl font-extrabold text-gray-800">Swift<span class="text-indigo-600">Ride</span></h1>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+
+        <!-- 1. Cab Booking Tab Content (Initial View) -->
+        <div id="content-cab-booking" class="tab-content content-card-base">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2">Book Your Cab Ride Now</h1>
+
+            <form id="booking-form" class="space-y-6">
+                <!-- Location Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="pickup" class="block text-sm font-medium text-gray-700 mb-1">Pickup Location</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input type="text" id="pickup" value="Tech Park, Bengaluru" placeholder="Enter pickup address" required
+                                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg transition duration-150">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="map-pin" class="h-5 w-5 text-indigo-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="dropoff" class="block text-sm font-medium text-gray-700 mb-1">Drop-off Location</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input type="text" id="dropoff" value="Central Station, Bengaluru" placeholder="Enter destination address" required
+                                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg transition duration-150">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="flag" class="h-5 w-5 text-indigo-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date/Time and Type -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="date" value="2025-10-25" required
+                               class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 border border-gray-300 rounded-lg transition duration-150">
+                    </div>
+                    <div>
+                        <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                        <input type="time" id="time" value="11:30" required
+                               class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 border border-gray-300 rounded-lg transition duration-150">
+                    </div>
+                    <div>
+                        <label for="passengers" class="block text-sm font-medium text-gray-700 mb-1">Passengers</label>
+                        <select id="passengers" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 border border-gray-300 rounded-lg transition duration-150">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        Find Rides
+                    </button>
+                </div>
+
+                <!-- Message Box for Cab Booking View -->
+                <div id="message-box" class="hidden p-4 rounded-lg text-sm font-medium" role="alert"></div>
+            </form>
+        </div>
+
+        <!-- 2. Driver Found / Select Ride Tab Content (Pre-tracking view) -->
+        <div id="content-driver-found" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2 flex justify-between items-center">
+                Driver Found! 
+                <button onclick="switchTab('cab-booking')" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> New Search
+                </button>
+            </h1>
+
+            <!-- Driver Details -->
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xl font-bold">AJ</div>
+                    <div>
+                        <p class="font-bold text-gray-800">Anand Jha</p>
+                        <div class="text-sm text-yellow-500 flex items-center">
+                            <i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i> 4.9 Rating | Swift Dzire (KA-01-M-6789)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Options Section -->
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Select Your Ride Type</h2>
+            <div id="ride-options-container" class="space-y-4 radio-card">
+                <!-- Ride options will be injected here -->
+            </div>
+
+             <!-- Confirm Button -->
+            <div class="pt-6">
+                <button onclick="confirmRide()"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                    Confirm Ride
+                </button>
+            </div>
+             <!-- Message Box for Driver Found View -->
+            <div id="driver-message-box" class="hidden p-4 mt-4 rounded-lg text-sm font-medium" role="alert"></div>
+
+        </div>
+        
+        <!-- 3. Live Tracking View (Maps Page) -->
+        <div id="content-tracking" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2">Live Ride Tracking</h1>
+            
+            <div id="map-simulation">
+                <!-- Driver Marker (Car) -->
+                <div class="driver-marker absolute flex flex-col items-center p-2 rounded-full bg-yellow-400 text-gray-900 shadow-xl">
+                    <i data-lucide="car-taxi-front" class="w-5 h-5"></i>
+                    <span id="driver-eta" class="text-xs font-bold mt-0.5">-- min</span>
+                </div>
+                <!-- User Marker (Pin) -->
+                 <div class="user-marker absolute flex flex-col items-center p-2 rounded-full bg-red-600 text-white shadow-xl">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+            </div>
+            
+            <!-- Time Statuses -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
+                <div class="p-4 bg-indigo-50 rounded-lg shadow-sm">
+                    <p class="text-xs font-medium text-indigo-600 uppercase">Driver Arriving In</p>
+                    <p id="time-to-pickup" class="text-3xl font-extrabold text-indigo-900">-- min</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg shadow-sm">
+                    <p class="text-xs font-medium text-green-600 uppercase">Estimated Arrival</p>
+                    <p id="time-to-dropoff" class="text-3xl font-extrabold text-green-900">--</p>
+                </div>
+            </div>
+            
+            <!-- Ride Details -->
+            <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h2 class="font-bold text-lg text-gray-800 mb-2">Driver: Anand Jha</h2>
+                <p class="text-sm text-gray-600">Ride Type: <span id="tracking-ride-type" class="font-semibold text-indigo-600"></span></p>
+                <p class="text-sm text-gray-600">Price: <span id="tracking-price" class="font-semibold text-green-700"></span></p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="pt-6 flex justify-between space-x-4">
+                 <button onclick="showMessage('tracking-message-box', 'default', 'Simulating call to driver...')"
+                        class="flex-1 flex items-center justify-center py-3 px-4 rounded-lg shadow-md text-base font-semibold text-indigo-600 bg-white border border-indigo-600 hover:bg-indigo-50 transition duration-150">
+                    <i data-lucide="phone" class="w-5 h-5 mr-2"></i> Call Driver
+                </button>
+                <button onclick="cancelRide()"
+                        class="flex-1 flex items-center justify-center py-3 px-4 rounded-lg shadow-md text-base font-semibold text-white bg-red-600 hover:bg-red-700 transition duration-150">
+                    Cancel Ride
+                </button>
+            </div>
+            <div id="tracking-message-box" class="hidden p-4 mt-4 rounded-lg text-sm font-medium" role="alert"></div>
+        </div>
+
+        <!-- 4. Flights Tab Content -->
+        <div id="content-flights" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2 flex items-center"><i data-lucide="plane" class="w-7 h-7 mr-3 text-indigo-600"></i> Flight Bookings</h1>
+            <div class="text-center p-12 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-lg">
+                <p class="text-2xl font-bold text-indigo-700 mb-2">Coming Soon!</p>
+                <p class="text-gray-600">We're working hard to bring you the best flight deals. Stay tuned!</p>
+            </div>
+        </div>
+        
+        <!-- 5. Bus Tab Content -->
+        <div id="content-bus" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2 flex items-center"><i data-lucide="bus" class="w-7 h-7 mr-3 text-indigo-600"></i> Bus Tickets</h1>
+            <div class="text-center p-12 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-lg">
+                <p class="text-2xl font-bold text-indigo-700 mb-2">Coming Soon!</p>
+                <p class="text-gray-600">Intercity and intracity bus booking will be available shortly!</p>
+            </div>
+        </div>
+        
+        <!-- 6. Train Tab Content -->
+        <div id="content-train" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2 flex items-center"><i data-lucide="train-front" class="w-7 h-7 mr-3 text-indigo-600"></i> Train Reservations</h1>
+            <div class="text-center p-12 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-lg">
+                <p class="text-2xl font-bold text-indigo-700 mb-2">Coming Soon!</p>
+                <p class="text-gray-600">Book your railway tickets quickly and easily here!</p>
+            </div>
+        </div>
+
+        <!-- 7. Hotel Tab Content -->
+        <div id="content-hotel" class="tab-content content-card-base hidden">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2 flex items-center"><i data-lucide="hotel" class="w-7 h-7 mr-3 text-indigo-600"></i> Hotel Stays</h1>
+            <div class="text-center p-12 bg-indigo-50 border-4 border-dashed border-indigo-200 rounded-lg">
+                <p class="text-2xl font-bold text-indigo-700 mb-2">Coming Soon!</p>
+                <p class="text-gray-600">Find and book the perfect stay for your next trip!</p>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // Global state to store current booking data
+    let currentBooking = {
+        pickup: '',
+        dropoff: '',
+        date: '',
+        time: '',
+        passengers: 1,
+        selectedRide: null,
+    };
+    
+    // Mock price options based on a destination/distance
+    const MOCK_PRICES = [
+        { type: 'Personal Cab', estimate: 450, time: '25 min', icon: 'car-taxi-front', desc: 'Direct ride with no stops.' },
+        { type: 'Shared Cab', estimate: 280, time: '35 min', icon: 'users', desc: 'Lower fare, possible co-passenger pickups.' },
+        { type: 'Premium SUV', estimate: 780, time: '25 min', icon: 'car-front', desc: 'High comfort and extra space.' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Replace all Lucide icons
+        lucide.createIcons();
+        // Automatically switch to the Cab Booking tab on load
+        switchTab('cab-booking');
+
+        // Add event listener for the booking form submission
+        document.getElementById('booking-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleBooking();
+        });
+    });
+
+    /**
+     * Shows a non-blocking message box in the UI.
+     */
+    function showMessage(targetId, type, message) {
+        const box = document.getElementById(targetId);
+        if (!box) return;
+
+        // Reset classes
+        box.className = '';
+        box.classList.add('p-4', 'rounded-lg', 'text-sm', 'font-medium', 'mt-4');
+
+        if (type === 'success') {
+            box.classList.add('bg-green-100', 'text-green-800');
+        } else if (type === 'error') {
+            box.classList.add('bg-red-100', 'text-red-800');
+        } else {
+            box.classList.add('bg-blue-100', 'text-blue-800');
+        }
+
+        box.innerHTML = message;
+        box.classList.remove('hidden');
+
+        // Hide message after 5 seconds
+        setTimeout(() => {
+            box.classList.add('hidden');
+        }, 5000);
+    }
+    
+    // List of main service tabs
+    const SERVICE_TABS = ['flights', 'train', 'bus', 'hotel', 'cab-booking'];
+
+    /**
+     * Switches the active tab and updates the application layout.
+     */
+    function switchTab(tabName) {
+        // 1. Hide all content tabs
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+
+        // 2. Deactivate all main navigation buttons (reset styling)
+        document.querySelectorAll('.nav-tab').forEach(button => {
+            // Remove active classes
+            button.classList.remove('border-indigo-600', 'text-indigo-700', 'font-bold');
+            // Add inactive/hover classes
+            button.classList.add('text-gray-600', 'hover:text-indigo-700', 'hover:border-indigo-300', 'border-transparent');
+        });
+
+        // 3. Show the requested content tab
+        const activeContent = document.getElementById(`content-${tabName}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+
+        // 4. Activate the requested navigation button (only for core service tabs)
+        if (SERVICE_TABS.includes(tabName)) {
+            const activeButton = document.getElementById(`tab-${tabName}`);
+            if (activeButton) {
+                // Remove inactive classes
+                activeButton.classList.remove('text-gray-600', 'hover:border-indigo-300', 'border-transparent');
+                // Add active classes
+                activeButton.classList.add('border-indigo-600', 'text-indigo-700', 'font-bold');
+            }
+        }
+        
+        // 5. Re-render lucide icons if the new view needs them
+        if (activeContent) {
+            lucide.createIcons();
+        }
+    }
+
+    /**
+     * Handles the initial booking search and switches to the driver found view.
+     */
+    function handleBooking() {
+        const pickup = document.getElementById('pickup').value;
+        const dropoff = document.getElementById('dropoff').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+
+        if (!pickup || !dropoff || !date || !time) {
+            showMessage('message-box', 'error', 'Please ensure all pickup, drop-off, date, and time fields are completed.');
+            return;
+        }
+
+        // Store data for the next step
+        currentBooking.pickup = pickup;
+        currentBooking.dropoff = dropoff;
+        currentBooking.date = date;
+        currentBooking.time = time;
+        currentBooking.passengers = document.getElementById('passengers').value;
+        currentBooking.selectedRide = MOCK_PRICES[0]; // Set default selection
+
+        renderRideOptions();
+        switchTab('driver-found');
+    }
+    
+    /**
+     * Renders the different price and cab options.
+     */
+    function renderRideOptions() {
+        const container = document.getElementById('ride-options-container');
+        container.innerHTML = '';
+        
+        MOCK_PRICES.forEach((ride, index) => {
+            const isChecked = index === 0;
+            const rideId = `ride-option-${index}`;
+            
+            const html = `
+                <div class="relative">
+                    <input type="radio" id="${rideId}" name="ride-option" value="${ride.type}" 
+                           class="hidden peer" ${isChecked ? 'checked' : ''} onchange="selectRide(${index})">
+                    <label for="${rideId}" 
+                           class="flex justify-between items-center p-4 cursor-pointer border-2 border-gray-200 rounded-lg transition duration-200 hover:border-indigo-400">
+                        <div class="flex items-center space-x-4">
+                            <i data-lucide="${ride.icon}" class="w-6 h-6 text-indigo-600"></i>
+                            <div>
+                                <p class="font-bold text-gray-900">${ride.type}</p>
+                                <p class="text-xs text-gray-500">${ride.desc}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xl font-extrabold text-gray-900">₹ ${ride.estimate.toLocaleString('en-IN')}</p>
+                            <p class="text-xs text-gray-500">Arrives in ${ride.time}</p>
+                        </div>
+                    </label>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+        
+        // Re-render lucide icons for the newly injected content
+        lucide.createIcons();
+    }
+    
+    /**
+     * Updates the selected ride in the global state when a radio button is clicked.
+     */
+    function selectRide(index) {
+        currentBooking.selectedRide = MOCK_PRICES[index];
+    }
+    
+    /**
+     * Simulates the final confirmation of the ride and redirects to the tracking page.
+     */
+    function confirmRide() {
+        if (!currentBooking.selectedRide) {
+            showMessage('driver-message-box', 'error', 'Please select a ride option before confirming.');
+            return;
+        }
+        
+        // Prepare tracking page with final details
+        renderTrackingPage();
+        
+        // Redirect to the new tracking map page
+        switchTab('tracking');
+    }
+    
+    /**
+     * Handles ride cancellation and resets state.
+     */
+     function cancelRide() {
+        // Clear the booking state (optional, but good practice)
+        currentBooking.selectedRide = null;
+        
+        // Switch back to the booking tab and show a message
+        switchTab('cab-booking');
+        showMessage('message-box', 'default', 'Ride cancelled. Please book again.');
+     }
+
+    /**
+     * Renders the details on the tracking page based on the confirmed booking.
+     */
+    function renderTrackingPage() {
+        const ride = currentBooking.selectedRide;
+        
+        // Calculate estimated dropoff time (Mocked: current time + 25 minutes)
+        const now = new Date();
+        // Mock driver arrival in 2 minutes
+        const dropoffTime = new Date(now.getTime() + (25 * 60000)); 
+        const dropoffTimeString = dropoffTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+        // Update tracking elements
+        document.getElementById('driver-eta').textContent = '2 min';
+        document.getElementById('time-to-pickup').textContent = '2 min';
+        document.getElementById('time-to-dropoff').textContent = dropoffTimeString;
+        document.getElementById('tracking-ride-type').textContent = ride.type;
+        document.getElementById('tracking-price').textContent = `₹ ${ride.estimate.toLocaleString('en-IN')}`;
+    }
+</script>
+
+</body>
+</html>
