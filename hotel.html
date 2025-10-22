@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking - StayWell Bengaluru</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Define Custom Colors for Tailwind (Primary: Cyan/Teal) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#0891b2', 
+                        'primary-hover': '#0e7490',
+                        'secondary-bg': '#f0f9ff', /* Cyan 50 */
+                        'rating-star': '#f59e0b',
+                        'inr-red': '#cc0000',
+                    },
+                    boxShadow: {
+                        'cyan-lg': '0 10px 15px -3px rgba(8, 145, 178, 0.3), 0 4px 6px -2px rgba(8, 145, 178, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Basic CSS for smooth view transitions */
+        .view {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .view.active {
+            opacity: 1;
+            position: relative;
+            display: block;
+        }
+        
+        /* Utility for the booking card layout */
+        .hotel-card {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hotel-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Star rating alignment */
+        .star-rating i {
+            color: #f59e0b; /* Amber 500 */
+        }
+
+        /* Custom INR Style */
+        .inr-price {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800; /* font-extrabold */
+            color: #cc0000; /* Custom Red */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-10 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-hotel text-primary text-3xl"></i>
+                    <h1 class="text-3xl font-extrabold text-gray-800">Stay<span class="text-primary">Well</span></h1>
+                </div>
+                
+                <!-- Navigation Tabs: Flights, Trains, Bus, Cabs, Hotels (Hotels is active) -->
+                <nav class="hidden md:flex space-x-6 items-end">
+                    <a href="../index.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-plane mr-2"></i>Flights</a>
+                    <a href="train.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-train mr-2"></i>Trains</a>
+                    <a href="bus.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-bus-alt mr-2"></i>Bus</a>
+                    <a href="hotel.html" class="tab px-2 py-1 text-primary font-bold flex items-center border-b-2 border-primary transition duration-150"><i class="fas fa-hotel mr-2"></i>Hotels</a>
+                    <a href="cabs.html" class="tab px-2 py-1 text-gray-500 hover:text-primary transition duration-150 flex items-center"><i class="fas fa-taxi mr-2"></i>Cabs</a>
+                    <!-- Active Tab -->
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper: This holds all the switchable views -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 relative">
+        
+        <!-- ==================================================================== -->
+        <!-- 1. SEARCH VIEW (Initial Screen) -->
+        <!-- ==================================================================== -->
+        <div id="search-view" class="view active">
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl shadow-cyan-100/50 relative z-0 mt-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-bed text-primary mr-3"></i> Find Your Stay in Bengaluru
+                </h2>
+                
+                <form id="hotel-search-form" onsubmit="handleHotelSearch(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        
+                        <!-- Destination -->
+                        <div class="lg:col-span-2">
+                            <label for="destination" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-map-marker-alt text-primary mr-1"></i> Destination</label>
+                            <!-- Default location set to Bengaluru -->
+                            <input type="text" id="destination" name="destination" value="Bengaluru, India" placeholder="City or Landmark" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
+                        </div>
+
+                        <!-- Check-in Date -->
+                        <div>
+                            <label for="check_in" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-calendar-check text-primary mr-1"></i> Check-in</label>
+                            <input type="date" id="check_in" name="check_in" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
+                        </div>
+
+                        <!-- Check-out Date -->
+                        <div>
+                            <label for="check_out" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-calendar-times text-primary mr-1"></i> Check-out</label>
+                            <input type="date" id="check_out" name="check_out" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150" required>
+                        </div>
+
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        
+                        <!-- Guests -->
+                        <div>
+                            <label for="guests" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-user-friends text-primary mr-1"></i> Guests</label>
+                            <select id="guests" name="guests" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white">
+                                <option value="1">1 Guest</option>
+                                <option value="2" selected>2 Guests</option> 
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Rooms -->
+                        <div>
+                            <label for="rooms" class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-door-open text-primary mr-1"></i> Rooms</label>
+                            <select id="rooms" name="rooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white">
+                                <option value="1" selected>1 Room</option>
+                                <option value="2">2 Rooms</option>
+                                <option value="3">3 Rooms</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="text-center pt-4">
+                        <button type="submit" class="w-full sm:w-1/2 lg:w-1/3 py-4 px-6 bg-primary text-white font-bold text-lg rounded-full hover:bg-primary-hover transition duration-300 shadow-xl shadow-cyan-400/50 flex items-center justify-center mx-auto transform hover:scale-[1.01]">
+                            <i class="fas fa-magnifying-glass mr-2"></i> Search Hotels
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================================================================== -->
+        <!-- 2. RESULTS VIEW (Select Hotel) -->
+        <!-- ==================================================================== -->
+        <div id="results-view" class="view">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Results in <span id="route-display" class="text-primary text-xl font-semibold ml-2"></span></h2>
+            <p class="text-gray-500 mb-6">Showing 3 best results for your criteria.</p>
+            
+            <div class="space-y-6">
+                
+                <!-- Back Button -->
+                <button onclick="switchView('search-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Search
+                </button>
+
+                <!-- Hotel Result 1: Luxury (AC & All Guests) -->
+                <div class="hotel-card bg-white grid grid-cols-1 md:grid-cols-3 gap-0">
+                    <!-- Image Placeholder (Room View) -->
+                    <div class="md:col-span-1 bg-gray-200 h-48 md:h-full flex items-center justify-center text-gray-500 text-sm overflow-hidden relative">
+                         <img src="https://placehold.co/600x400/06b6d4/ffffff?text=Luxury+Room+View" onerror="this.onerror=null;this.src='https://placehold.co/600x400/06b6d4/ffffff?text=Luxury+Room+View';" alt="Luxury Hotel Room" class="w-full h-full object-cover">
+                         <div class="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">5 Star Deluxe</div>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div class="md:col-span-2 p-4 md:p-6 flex justify-between">
+                        <div class="flex-grow">
+                            <p class="text-xl font-bold text-gray-800">The Leela Palace Bengaluru</p>
+                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fas fa-map-marker-alt mr-1"></i> Near Old Airport Road, Kodihalli</p>
+                            <p class="star-rating text-sm mb-3">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> (<span class="font-bold">9.7/10</span> - Exceptional)
+                            </p>
+                            <div class="text-sm text-gray-600 space-y-2">
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full"><i class="fas fa-fan mr-1"></i> **AC Room Included**</span>
+                                <span class="bg-gray-100 px-2 py-1 rounded-full block"><i class="fas fa-users text-blue-500 mr-1"></i> **Suits All Guests:** Single, Married, Couple, Unmarried</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Price and Book -->
+                        <div class="text-right flex flex-col justify-between items-end min-w-[140px]">
+                            <p class="text-lg font-semibold text-gray-500">Total Price</p>
+                            <p class="inr-price">₹ <span id="price-hotel1">12000</span></p>
+                            <p class="text-xs text-gray-500">for <span id="nights-hotel1"></span> nights</p>
+                            <button onclick="handleSelectHotel('The Leela Palace Bengaluru', document.getElementById('price-hotel1').textContent)" class="mt-3 py-2 px-6 bg-primary text-white font-medium rounded-full hover:bg-primary-hover transition duration-200 shadow-cyan-lg flex items-center justify-center">
+                                <i class="fas fa-bookmark mr-2"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hotel Result 2: Mid-Range (AC & Limited Unmarried) -->
+                <div class="hotel-card bg-white grid grid-cols-1 md:grid-cols-3 gap-0">
+                    <!-- Image Placeholder (Room View) -->
+                    <div class="md:col-span-1 bg-gray-200 h-48 md:h-full flex items-center justify-center text-gray-500 text-sm overflow-hidden relative">
+                         <img src="https://placehold.co/600x400/fcd34d/000000?text=Executive+Room+View" onerror="this.onerror=null;this.src='https://placehold.co/600x400/fcd34d/000000?text=Executive+Room+View';" alt="Mid-Range Hotel Room" class="w-full h-full object-cover">
+                         <div class="absolute top-2 left-2 bg-yellow-500 text-gray-800 text-xs font-bold px-2 py-1 rounded-full">4 Star</div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="md:col-span-2 p-4 md:p-6 flex justify-between">
+                        <div class="flex-grow">
+                            <p class="text-xl font-bold text-gray-800">The Chancery Pavilion</p>
+                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fas fa-map-marker-alt mr-1"></i> Residency Road, Central Business District</p>
+                            <p class="star-rating text-sm mb-3">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star text-gray-300"></i> (<span class="font-bold">8.5/10</span> - Very Good)
+                            </p>
+                            <div class="text-sm text-gray-600 space-y-2">
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full"><i class="fas fa-fan mr-1"></i> **AC Room Included**</span>
+                                <span class="bg-gray-100 px-2 py-1 rounded-full block"><i class="fas fa-heart text-pink-500 mr-1"></i> **Suits:** Single, Married, Couple. <span class="font-bold text-red-500">Unmarried Guests at Management Discretion.</span></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Price and Book -->
+                        <div class="text-right flex flex-col justify-between items-end min-w-[140px]">
+                            <p class="text-lg font-semibold text-gray-500">Total Price</p>
+                            <p class="inr-price">₹ <span id="price-hotel2">5800</span></p>
+                            <p class="text-xs text-gray-500">for <span id="nights-hotel2"></span> nights</p>
+                            <button onclick="handleSelectHotel('The Chancery Pavilion', document.getElementById('price-hotel2').textContent)" class="mt-3 py-2 px-6 bg-primary text-white font-medium rounded-full hover:bg-primary-hover transition duration-200 shadow-cyan-lg flex items-center justify-center">
+                                <i class="fas fa-bookmark mr-2"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hotel Result 3: Budget (Non-AC/AC Option & Strict Policy) -->
+                <div class="hotel-card bg-white grid grid-cols-1 md:grid-cols-3 gap-0">
+                    <!-- Image Placeholder (Room View) -->
+                    <div class="md:col-span-1 bg-gray-200 h-48 md:h-full flex items-center justify-center text-gray-500 text-sm overflow-hidden relative">
+                         <img src="https://placehold.co/600x400/8b5cf6/ffffff?text=Basic+Room+View" onerror="this.onerror=null;this.src='https://placehold.co/600x400/8b5cf6/ffffff?text=Basic+Room+View';" alt="Budget Hotel Room" class="w-full h-full object-cover">
+                         <div class="absolute top-2 left-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">3 Star Budget</div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="md:col-span-2 p-4 md:p-6 flex justify-between">
+                        <div class="flex-grow">
+                            <p class="text-xl font-bold text-gray-800">SPOT ON near Majestic (No AC)</p>
+                            <p class="text-sm text-gray-500 mb-2 flex items-center"><i class="fas fa-map-marker-alt mr-1"></i> Close to City Railway Station, Majestic</p>
+                            <p class="star-rating text-sm mb-3">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i> (<span class="font-bold">6.9/10</span> - Fair)
+                            </p>
+                            <div class="text-sm text-gray-600 space-y-2">
+                                <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full"><i class="fas fa-thermometer-half mr-1"></i> **Non-AC Room** (+₹500 for AC upgrade)</span>
+                                <span class="bg-gray-100 px-2 py-1 rounded-full block"><i class="fas fa-shield-alt text-red-500 mr-1"></i> **Suits:** Single, Married. <span class="font-bold">No unmarried couples/local ID accepted.</span></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Price and Book -->
+                        <div class="text-right flex flex-col justify-between items-end min-w-[140px]">
+                            <p class="text-lg font-semibold text-gray-500">Total Price</p>
+                            <p class="inr-price">₹ <span id="price-hotel3">2400</span></p>
+                            <p class="text-xs text-gray-500">for <span id="nights-hotel3"></span> nights</p>
+                            <button onclick="handleSelectHotel('SPOT ON near Majestic (No AC)', document.getElementById('price-hotel3').textContent)" class="mt-3 py-2 px-6 bg-primary text-white font-medium rounded-full hover:bg-primary-hover transition duration-200 shadow-cyan-lg flex items-center justify-center">
+                                <i class="fas fa-bookmark mr-2"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================================================================== -->
+        <!-- 3. DETAILS VIEW (Enter Guest Details) -->
+        <!-- ==================================================================== -->
+        <div id="details-view" class="view">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Guest & Contact Details</h2>
+            <p class="text-lg text-gray-600 mb-6">
+                Booking: <span id="hotel-name-display" class="font-bold text-primary"></span> 
+                (<span class="font-bold text-inr-red">₹ <span id="hotel-total-price"></span> total</span>)
+            </p>
+
+            <div class="bg-white p-6 rounded-xl shadow-2xl shadow-cyan-100/50">
+                <button onclick="switchView('results-view')" class="text-sm font-medium text-primary hover:text-primary-hover transition mb-4 flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Change Hotel
+                </button>
+                
+                <form id="guest-form" onsubmit="handleGuestForm(event)" class="space-y-6">
+                    
+                    <!-- Primary Guest Details -->
+                    <h3 class="font-bold text-xl text-primary pt-4">Primary Guest</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border p-4 rounded-xl bg-secondary-bg">
+                        <div>
+                            <label for="guest-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="guest-name" value="Ravi Kumar" class="guest-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
+                        </div>
+                        <div>
+                            <label for="guest-email" class="block text-sm font-medium text-gray-700 mb-1">Email (Confirmation will be sent here)</label>
+                            <input type="email" id="guest-email" value="ravi.kumar@example.in" class="guest-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
+                        </div>
+                        <div>
+                            <label for="guest-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="guest-phone" value="+919876543210" class="guest-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
+                        </div>
+                    </div>
+
+                    <!-- Room Occupancy Details -->
+                    <h3 class="font-bold text-xl text-primary pt-4 border-t mt-6">Room Occupancy & Preferences</h3>
+                    <div id="room-details-container" class="space-y-4">
+                        <!-- Room forms injected here -->
+                    </div>
+
+                    <!-- Proceed Button -->
+                    <div class="text-center pt-6">
+                        <button type="submit" class="w-full md:w-1/3 py-3 px-6 bg-primary text-white font-bold text-lg rounded-full hover:bg-primary-hover transition duration-300 shadow-xl shadow-cyan-400/50">
+                            <i class="fas fa-credit-card mr-2"></i> Confirm & Pay
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================================================================== -->
+        <!-- 4. CONFIRMATION VIEW (Success and Download) -->
+        <!-- ==================================================================== -->
+        <div id="confirmation-view" class="view">
+            <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl shadow-cyan-200/50 text-center max-w-xl mx-auto">
+                <i class="fas fa-check-circle text-primary text-6xl mb-4"></i>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Hotel Booked!</h2>
+                <p class="text-xl text-gray-600 mb-6">Your reservation has been successfully processed.</p>
+                
+                <div class="bg-secondary-bg p-4 rounded-lg border border-cyan-200 mb-8 text-left">
+                    <p class="text-md text-primary font-semibold mb-1">Confirmation ID: <span class="font-bold">BLR-901273</span></p>
+                    <p class="text-sm text-gray-700">Hotel: <span id="final-hotel-name" class="font-medium"></span></p>
+                    <p class="text-sm text-gray-700">Check-in: <span id="final-check-in" class="font-medium"></span> | Check-out: <span id="final-check-out" class="font-medium"></span></p>
+                    <p class="text-sm text-gray-700">Rooms: <span id="final-rooms" class="font-medium"></span> | Guests: <span id="final-guests" class="font-medium"></span></p>
+                    <p class="text-lg text-inr-red font-bold mt-2 border-t pt-2">Total Paid: <span id="final-price-confirmation"></span></p>
+                </div>
+
+                <!-- Terms & Conditions Button -->
+                <button onclick="showTnCBox()" class="text-sm text-primary hover:text-primary-hover transition font-medium mb-4 flex items-center justify-center mx-auto">
+                    <i class="fas fa-file-contract mr-2"></i> View Booking Terms & Conditions
+                </button>
+                
+                <!-- Download Button -->
+                <button onclick="downloadBookingPdf()" class="download-button w-full py-3 px-6 bg-primary text-white font-bold text-lg rounded-full hover:bg-primary-hover transition duration-300 shadow-xl flex items-center justify-center">
+                    <i class="fas fa-download mr-3 transition duration-200"></i> Download Confirmation (PDF)
+                </button>
+
+                <!-- Start New Search -->
+                <button onclick="switchView('search-view')" class="mt-4 text-primary hover:text-primary-hover transition font-medium">
+                    <i class="fas fa-plus mr-1"></i> Start a New Search
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-sm text-gray-500">
+            &copy; <span id="current-year-footer"></span> StayWell Demo. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Simple Message Box (For alerts) -->
+    <div id="message-box" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-2xl text-center max-w-xs">
+            <p id="message-content" class="text-gray-800 font-semibold mb-4"></p>
+            <button onclick="hideMessageBox()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition">OK</button>
+        </div>
+    </div>
+
+    <!-- Terms and Conditions Modal -->
+    <div id="tnc-box" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <h3 class="text-2xl font-bold text-primary mb-4 border-b pb-2">Booking Terms & Conditions (India)</h3>
+            <div class="text-sm text-gray-700 space-y-4">
+                <p>1. **Government ID Mandatory:** All guests (including children) must carry valid photo identification (Aadhaar, Passport, Driving License) for check-in. Local government may require additional verification.</p>
+                <p>2. **Couple/Unmarried Policy:** Policies vary by hotel. Hotels explicitly listed as "Suits All Guests" have liberal policies. Hotels with restrictions (e.g., "Unmarried Guests at Management Discretion" or "No unmarried couples/local ID accepted") may refuse check-in without refund if policies are violated. Please check your chosen hotel's policy carefully.</p>
+                <p>3. **AC/Non-AC:** Rooms are sold as described. AC rooms have cooling included. Non-AC rooms (FAN ONLY) do not, unless an AC upgrade supplement is paid at the property, subject to availability.</p>
+                <p>4. **Check-in/Check-out:** Standard check-in is 2:00 PM and check-out is 11:00 AM. Early check-in or late check-out is subject to availability and charges.</p>
+                <p>5. **Cancellation:** This booking is a non-refundable, non-transferable demo. Real bookings would have a detailed cancellation policy.</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="hideTnCBox()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Global state to store booking details across views
+        let hotelBookingDetails = {
+            destination: '',
+            checkIn: '',
+            checkOut: '',
+            nights: 0,
+            rooms: 0,
+            guests: 0,
+            hotelName: '',
+            basePrice: 0, // Total price for the stay, not per person/night
+        };
+
+        // Initialize the year in the footer
+        document.getElementById('current-year-footer').textContent = new Date().getFullYear();
+
+        // --- CORE VIEW SWITCHING LOGIC ---
+
+        /**
+         * Switches the active content view by setting the 'active' class.
+         * @param {string} viewId - The ID of the view div to show (e.g., 'results-view').
+         */
+        function switchView(viewId) {
+            const views = document.querySelectorAll('.view');
+            views.forEach(view => {
+                view.classList.remove('active');
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active');
+                window.scrollTo(0, 0); // Scroll to top for new view
+            }
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        
+        /**
+         * Calculates the number of nights between two date strings.
+         * @param {string} date1 - Check-in date string.
+         * @param {string} date2 - Check-out date string.
+         * @returns {number} Number of nights.
+         */
+        function calculateNights(date1, date2) {
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            if (d1 >= d2) return 0;
+            const diffTime = Math.abs(d2 - d1);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        /**
+         * Formats a number into Indian Rupees (INR) string.
+         * @param {number} amount - The numeric amount.
+         * @returns {string} Formatted INR string (e.g., "₹ 12,000.00").
+         */
+        function formatINR(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0 // Keep it clean for whole rupee amounts
+            }).format(amount);
+        }
+
+        // --- STEP 1: SEARCH VIEW HANDLER ---
+        function handleHotelSearch(event) {
+            event.preventDefault(); 
+            
+            const destination = document.getElementById('destination').value;
+            const checkIn = document.getElementById('check_in').value;
+            const checkOut = document.getElementById('check_out').value;
+            const rooms = parseInt(document.getElementById('rooms').value);
+            const guests = parseInt(document.getElementById('guests').value);
+            
+            const nights = calculateNights(checkIn, checkOut);
+
+            if (!destination || nights <= 0) {
+                showMessageBox("Please ensure a destination is entered and check-out is after check-in.");
+                return;
+            }
+
+            // Store search data globally
+            hotelBookingDetails.destination = destination;
+            hotelBookingDetails.checkIn = checkIn;
+            hotelBookingDetails.checkOut = checkOut;
+            hotelBookingDetails.nights = nights;
+            hotelBookingDetails.rooms = rooms;
+            hotelBookingDetails.guests = guests;
+
+            // Update display elements on results page
+            document.getElementById('route-display').textContent = 
+                `${destination} (${nights} night${nights > 1 ? 's' : ''})`;
+
+            // Base prices are simulated for 2 nights stay
+            const priceNights = [12000, 5800, 2400]; // Mock INR prices for 2 nights
+            const newPrices = priceNights.map(price => (price / 2) * nights);
+
+            document.getElementById('price-hotel1').textContent = formatINR(newPrices[0]).replace('₹', '').trim();
+            document.getElementById('price-hotel2').textContent = formatINR(newPrices[1]).replace('₹', '').trim();
+            document.getElementById('price-hotel3').textContent = formatINR(newPrices[2]).replace('₹', '').trim();
+            
+            // Update night count display in results
+            document.getElementById('nights-hotel1').textContent = nights;
+            document.getElementById('nights-hotel2').textContent = nights;
+            document.getElementById('nights-hotel3').textContent = nights;
+
+
+            // Go to Step 2: Results View
+            switchView('results-view');
+        }
+
+        // --- STEP 2: RESULTS VIEW HANDLER (Select Hotel) ---
+        function handleSelectHotel(hotelName, totalPriceString) {
+            // Remove commas for clean parsing, then store selected hotel details globally
+            const numericPrice = parseFloat(totalPriceString.replace(/,/g, ''));
+            
+            hotelBookingDetails.hotelName = hotelName;
+            hotelBookingDetails.basePrice = numericPrice; // Total price for the entire stay
+
+            // Update details on the guest details page
+            document.getElementById('hotel-name-display').textContent = hotelName;
+            document.getElementById('hotel-total-price').textContent = formatINR(hotelBookingDetails.basePrice).replace('₹', '').trim();
+            
+            // Render room forms
+            renderRoomDetails();
+
+            // Go to Step 3: Details View
+            switchView('details-view');
+        }
+        
+        // --- Dynamic Room Form Rendering ---
+        function renderRoomDetails() {
+            const container = document.getElementById('room-details-container');
+            container.innerHTML = ''; // Clear existing forms
+            const numRooms = hotelBookingDetails.rooms;
+            const numGuests = hotelBookingDetails.guests;
+            
+            // Simple distribution of guests across rooms
+            let guestsRemaining = numGuests;
+
+            for (let i = 1; i <= numRooms; i++) {
+                // Determine guests for this room (simple max of 2, but adjusted if rooms needed)
+                let guestsForThisRoom = 0;
+                if (guestsRemaining > 0) {
+                    guestsForThisRoom = Math.min(2, guestsRemaining); // Assuming 2 guests per room for simplicity
+                    guestsRemaining -= guestsForThisRoom;
+                } else if (i === 1) {
+                    guestsForThisRoom = 1; 
+                }
+
+                const roomHtml = `
+                    <div class="border p-4 rounded-xl bg-gray-50 shadow-sm">
+                        <h4 class="font-bold text-lg text-gray-800 mb-2">
+                            Room ${i} Details (${guestsForThisRoom} Guest${guestsForThisRoom > 1 ? 's' : ''})
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="room${i}-bed" class="block text-sm font-medium text-gray-700 mb-1">Bed Preference</label>
+                                <select id="room${i}-bed" name="room${i}-bed" class="room-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white">
+                                    <option value="King">King Bed</option>
+                                    <option value="Twin">Twin Beds</option>
+                                    <option value="Double" ${guestsForThisRoom > 1 ? 'selected' : ''}>Double Bed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="room${i}-ac" class="block text-sm font-medium text-gray-700 mb-1">A/C Preference</label>
+                                <select id="room${i}-ac" name="room${i}-ac" class="room-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white">
+                                    <option value="AC" selected>A/C (Default)</option>
+                                    <option value="Non-AC">Non A/C (Budget/Fan Only)</option>
+                                    <option value="AC-Upgrade">A/C (Upgrade Request)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="room${i}-request" class="block text-sm font-medium text-gray-700 mb-1">Special Request (Optional)</label>
+                                <input type="text" id="room${i}-request" placeholder="Early check-in, etc." class="room-input w-full p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', roomHtml);
+            }
+        }
+
+
+        // --- STEP 3: DETAILS VIEW HANDLER ---
+        function handleGuestForm(event) {
+            event.preventDefault();
+
+            // Simple validation check for all required fields
+            const requiredInputs = document.querySelectorAll('.guest-input');
+            let allFilled = true;
+            requiredInputs.forEach(input => {
+                if (!input.value) {
+                    allFilled = false;
+                }
+            });
+
+            if (!allFilled) {
+                showMessageBox("Please ensure all primary guest and contact details are filled.");
+                return;
+            }
+
+            // Update final confirmation details
+            document.getElementById('final-hotel-name').textContent = hotelBookingDetails.hotelName;
+            document.getElementById('final-check-in').textContent = hotelBookingDetails.checkIn;
+            document.getElementById('final-check-out').textContent = hotelBookingDetails.checkOut;
+            document.getElementById('final-rooms').textContent = hotelBookingDetails.rooms;
+            document.getElementById('final-guests').textContent = hotelBookingDetails.guests;
+            document.getElementById('final-price-confirmation').textContent = formatINR(hotelBookingDetails.basePrice);
+
+
+            // Go to Step 4: Confirmation View (simulates payment step)
+            switchView('confirmation-view');
+        }
+
+
+        // --- STEP 4: CONFIRMATION VIEW HANDLER (Download PDF) ---
+        function downloadBookingPdf() {
+            // Collect room preferences for the file content
+            const roomInputs = document.querySelectorAll('.room-input');
+            const roomDetails = [];
+            
+            for (let i = 0; i < hotelBookingDetails.rooms; i++) {
+                const bedPref = roomInputs[i * 3].value; // 3 inputs per room
+                const acPref = roomInputs[i * 3 + 1].value;
+                const req = roomInputs[i * 3 + 2].value || 'None';
+                roomDetails.push(`Room ${i + 1}: Bed: ${bedPref} | HVAC: ${acPref} | Request: ${req}`);
+            }
+
+            const primaryGuestName = document.getElementById('guest-name').value;
+            const primaryGuestEmail = document.getElementById('guest-email').value;
+            const primaryGuestPhone = document.getElementById('guest-phone').value;
+
+            const ticketInfo = `
+=============================================
+             HOTEL RESERVATION CONFIRMATION
+=============================================
+Confirmation ID: BLR-901273
+Hotel: ${hotelBookingDetails.hotelName}
+Destination: ${hotelBookingDetails.destination}
+
+---------------------------------------------
+STAY DETAILS
+---------------------------------------------
+Check-in: ${hotelBookingDetails.checkIn}
+Check-out: ${hotelBookingDetails.checkOut}
+Nights: ${hotelBookingDetails.nights}
+Rooms: ${hotelBookingDetails.rooms}
+Guests: ${hotelBookingDetails.guests}
+Total Paid: ${formatINR(hotelBookingDetails.basePrice)}
+
+---------------------------------------------
+PRIMARY GUEST & CONTACT
+---------------------------------------------
+Name: ${primaryGuestName}
+Email: ${primaryGuestEmail}
+Phone: ${primaryGuestPhone}
+
+---------------------------------------------
+ROOM PREFERENCES
+---------------------------------------------
+${roomDetails.join('\n')}
+
+=============================================
+This is a simulated confirmation for demonstration.
+Thank you for booking with StayWell!
+=============================================
+`;
+            // Simple text file download simulation for PDF
+            const blob = new Blob([ticketInfo], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Hotel_Confirmation_${primaryGuestName.replace(/\s/g, '_')}.txt`; 
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessageBox("Confirmation simulated download complete!");
+        }
+
+
+        // --- UTILITY: MESSAGE BOX & TNC MODAL ---
+        
+        /** Shows a custom message box instead of using the forbidden alert(). */
+        function showMessageBox(message) {
+            document.getElementById('message-content').textContent = message;
+            document.getElementById('message-box').classList.remove('hidden');
+            document.getElementById('message-box').classList.add('flex');
+        }
+
+        /** Hides the custom message box. */
+        function hideMessageBox() {
+            document.getElementById('message-box').classList.add('hidden');
+            document.getElementById('message-box').classList.remove('flex');
+        }
+
+        /** Shows the Terms and Conditions modal. */
+        function showTnCBox() {
+            document.getElementById('tnc-box').classList.remove('hidden');
+            document.getElementById('tnc-box').classList.add('flex');
+        }
+        
+        /** Hides the Terms and Conditions modal. */
+        function hideTnCBox() {
+            document.getElementById('tnc-box').classList.add('hidden');
+            document.getElementById('tnc-box').classList.remove('flex');
+        }
+        
+    </script>
+</body>
+</html>
